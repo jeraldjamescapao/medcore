@@ -12,6 +12,9 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         
         builder.HasKey(x => x.Id);
         
+        builder.Property(x => x.Id)
+            .HasColumnName("id");
+        
         builder.Property(x => x.Email)
             .HasColumnName("email")
             .IsRequired()
@@ -34,7 +37,8 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         
         builder.Property(x => x.IsActive)
             .HasColumnName("is_active")
-            .IsRequired();
+            .IsRequired()
+            .HasDefaultValue(true);
         
         builder.Property(x => x.CreatedAtUtc)
             .HasColumnName("created_at_utc")
