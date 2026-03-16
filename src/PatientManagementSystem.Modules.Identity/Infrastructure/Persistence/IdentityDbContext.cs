@@ -53,6 +53,11 @@ public class IdentityDbContext
         builder.Entity<ApplicationRole>(entity =>
         {
             entity.ToTable("roles");
+            
+            entity.Property(x => x.Description)
+                .HasColumnName("description")
+                .IsRequired()
+                .HasMaxLength(250);
         });
 
         builder.Entity<IdentityUserRole<Guid>>(entity =>
