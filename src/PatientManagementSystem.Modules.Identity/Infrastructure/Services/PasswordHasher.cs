@@ -1,8 +1,6 @@
-using PatientManagementSystem.Modules.Identity.Application.Interfaces;
-
 namespace PatientManagementSystem.Modules.Identity.Infrastructure.Services;
 
-using Identity.Application.Interfaces;
+using PatientManagementSystem.Modules.Identity.Application.Abstractions.Authentication;
 
 public class PasswordHasher : IPasswordHasher
 {
