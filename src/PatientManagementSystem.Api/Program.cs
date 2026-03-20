@@ -1,3 +1,4 @@
+using PatientManagementSystem.Common.Middleware;
 using PatientManagementSystem.Modules.Identity;
 using PatientManagementSystem.Modules.Identity.DependencyInjection;
 using PatientManagementSystem.Modules.Identity.Infrastructure.Persistence;
@@ -17,6 +18,8 @@ builder.Services.AddIdentityModule(builder.Configuration);
 var app = builder.Build();
 
 await IdentityRoleSeeder.SeedAsync(app.Services);
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

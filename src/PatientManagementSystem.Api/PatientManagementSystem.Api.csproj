@@ -16,12 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Configuration\" />
-      <Folder Include="Extensions\" />
-      <Folder Include="Middleware\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\PatientManagementSystem.Modules.Identity\PatientManagementSystem.Modules.Identity.csproj" />
     </ItemGroup>
 
