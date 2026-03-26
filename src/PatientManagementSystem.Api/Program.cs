@@ -1,6 +1,6 @@
 using PatientManagementSystem.Common.Middleware;
 using PatientManagementSystem.Modules.Identity;
-using PatientManagementSystem.Modules.Identity.DependencyInjection;
+using PatientManagementSystem.Modules.Identity.Configuration;
 using PatientManagementSystem.Modules.Identity.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);

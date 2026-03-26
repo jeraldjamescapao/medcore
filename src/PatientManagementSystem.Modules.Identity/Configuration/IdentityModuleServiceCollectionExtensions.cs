@@ -1,4 +1,4 @@
-namespace PatientManagementSystem.Modules.Identity.DependencyInjection;
+namespace PatientManagementSystem.Modules.Identity.Configuration;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,12 +19,28 @@ public static class IdentityModuleServiceCollectionExtensions
         var connectionString = configuration.GetConnectionString("PostgreSqlConnection") 
             ?? throw new InvalidOperationException("Database connection string was not found.");
 
+        services.AddIdentityPersistence(connectionString);
+        services.AddIdentityServices();
+        
+        return services;
+    }
+
+    private static IServiceCollection AddIdentityPersistence(
+        this IServiceCollection services,
+        string connectionString)
+    {
         services.AddDbContext<IdentityDbContext>(options =>
         {
             options.UseNpgsql(connectionString)
                 .UseSnakeCaseNamingConvention();
         });
+        
+        return services;
+    }
 
+    private static IServiceCollection AddIdentityServices(
+        this IServiceCollection services)
+    {
         services.AddDataProtection();
         
         services
@@ -48,6 +64,7 @@ public static class IdentityModuleServiceCollectionExtensions
         
         services.AddScoped<IAuthService, AuthService>();
         
-        return services;
+        return services;       
     }
+    
 }
