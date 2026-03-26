@@ -1,5 +1,6 @@
 namespace PatientManagementSystem.Modules.Identity.Configuration;
 
+using Asp.Versioning;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +26,7 @@ public static class IdentityModuleServiceCollectionExtensions
 
         services.AddIdentityPersistence(connectionString);
         services.AddIdentityServices();
+        services.AddApiVersioning();
         
         return services;
     }
@@ -75,4 +77,17 @@ public static class IdentityModuleServiceCollectionExtensions
         return services;       
     }
     
+    private static IServiceCollection AddIdentityApiVersioning(
+        this IServiceCollection services)
+    {
+        services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+        });
+
+        return services;
+    }
+
 }

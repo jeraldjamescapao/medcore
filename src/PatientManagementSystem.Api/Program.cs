@@ -6,6 +6,7 @@ using PatientManagementSystem.Modules.Identity.Infrastructure.Persistence;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+builder.Services.AddApiVersioning().AddMvc();
 
 builder.Services.RegisterModules(
     builder.Configuration,
