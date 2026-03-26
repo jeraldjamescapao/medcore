@@ -16,12 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Application\Validators\" />
-      <Folder Include="Domain\Tokens\" />
-      <Folder Include="Infrastructure\Authentication\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\PatientManagementSystem.Common\PatientManagementSystem.Common.csproj" />
     </ItemGroup>
 

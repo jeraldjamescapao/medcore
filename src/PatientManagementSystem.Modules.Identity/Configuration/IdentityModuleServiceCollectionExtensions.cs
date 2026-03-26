@@ -7,8 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using PatientManagementSystem.Modules.Identity.Application.Abstractions.Authentication;
 using PatientManagementSystem.Modules.Identity.Application.Services;
 using PatientManagementSystem.Modules.Identity.Domain.Roles;
+using PatientManagementSystem.Modules.Identity.Domain.Tokens;
 using PatientManagementSystem.Modules.Identity.Domain.Users;
 using PatientManagementSystem.Modules.Identity.Infrastructure.Persistence;
+using PatientManagementSystem.Modules.Identity.Infrastructure.Persistence.Repositories;
     
 public static class IdentityModuleServiceCollectionExtensions
 {
@@ -63,6 +65,7 @@ public static class IdentityModuleServiceCollectionExtensions
             .AddDefaultTokenProviders();
         
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         
         return services;       
     }

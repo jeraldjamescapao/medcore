@@ -1,16 +1,17 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace PatientManagementSystem.Modules.Identity.Infrastructure.Persistence;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PatientManagementSystem.Modules.Identity.Domain.Roles;
+using PatientManagementSystem.Modules.Identity.Domain.Tokens; 
 using PatientManagementSystem.Modules.Identity.Domain.Users;
 
 public class IdentityDbContext 
     : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
 {
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    
     public IdentityDbContext(DbContextOptions<IdentityDbContext> options)
         : base(options)
     {
@@ -85,5 +86,40 @@ public class IdentityDbContext
             entity.ToTable("user_tokens");
         });
         
+        builder.Entity<RefreshToken>(entity =>
+        {
+            entity.ToTable("refresh_tokens");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Token)
+                .IsRequired()
+                .HasMaxLength(500);
+
+            entity.Property(x => x.ExpiresAtUtc)
+                .HasColumnType("timestamp with time zone")
+                .IsRequired();
+
+            entity.Property(x => x.CreatedAtUtc)
+                .HasColumnType("timestamp with time zone")
+                .IsRequired();
+
+            entity.Property(x => x.IsRevoked)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            entity.HasOne<ApplicationUser>()
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasIndex(x => x.Token)
+                .IsUnique();
+
+            entity.HasIndex(x => x.FamilyId);
+
+            entity.HasIndex(x => x.UserId);
+        });
+
     }
 }
