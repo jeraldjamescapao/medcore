@@ -13,6 +13,15 @@ public static class AuthErrors
     public static readonly ResultError AccountDeactivated =
         new("IDENTITY_AUTH_ACCOUNT_DEACTIVATED", "Account is deactivated.");
 
+    public static readonly ResultError EmailNotConfirmed =
+        new("IDENTITY_AUTH_EMAIL_NOT_CONFIRMED", "Email address has not been confirmed.");
+    
+    public static readonly ResultError UserNotFoundOrInactive =
+        new("IDENTITY_AUTH_USER_NOT_FOUND_OR_INACTIVE", "User not found or deactivated.");
+    
+    public static readonly ResultError RoleAssignmentFailed =
+        new("IDENTITY_AUTH_ROLE_ASSIGNMENT_FAILED", "Failed to assign role.");
+    
     public static readonly ResultError InvalidRefreshToken =
         new("IDENTITY_AUTH_INVALID_REFRESH_TOKEN", "Invalid refresh token.");
 
@@ -22,12 +31,6 @@ public static class AuthErrors
     public static readonly ResultError TokenExpiredOrRevoked =
         new("IDENTITY_AUTH_TOKEN_EXPIRED_OR_REVOKED", "Refresh token is expired or revoked.");
 
-    public static readonly ResultError UserNotFoundOrInactive =
-        new("IDENTITY_AUTH_USER_NOT_FOUND_OR_INACTIVE", "User not found or deactivated.");
-
     public static readonly ResultError TokenAlreadyRevoked =
         new("IDENTITY_AUTH_TOKEN_ALREADY_REVOKED", "Token is already revoked or expired.");
-
-    public static readonly ResultError RoleAssignmentFailed =
-        new("IDENTITY_AUTH_ROLE_ASSIGNMENT_FAILED", "Failed to assign role.");
 }

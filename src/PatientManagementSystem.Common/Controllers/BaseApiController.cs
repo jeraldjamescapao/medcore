@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.Http;
-
 namespace PatientManagementSystem.Common.Controllers;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PatientManagementSystem.Common.Results;
 
