@@ -33,6 +33,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapGet("/", () => "Hello, this is James! Welcome to my humble Patient Management System API! :)");
 app.MapControllers();
 app.MapModuleEndpoints();

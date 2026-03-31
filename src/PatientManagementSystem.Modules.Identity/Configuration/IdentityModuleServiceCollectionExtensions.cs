@@ -1,19 +1,23 @@
 namespace PatientManagementSystem.Modules.Identity.Configuration;
 
-using Asp.Versioning;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using PatientManagementSystem.Common.Services;
 using PatientManagementSystem.Modules.Identity.Application.Abstractions.Authentication;
 using PatientManagementSystem.Modules.Identity.Application.Services;
 using PatientManagementSystem.Modules.Identity.Domain.Roles;
 using PatientManagementSystem.Modules.Identity.Domain.Tokens;
 using PatientManagementSystem.Modules.Identity.Domain.Users;
+using PatientManagementSystem.Modules.Identity.Infrastructure.Authentication;
 using PatientManagementSystem.Modules.Identity.Infrastructure.Persistence;
 using PatientManagementSystem.Modules.Identity.Infrastructure.Persistence.Repositories;
 using PatientManagementSystem.Modules.Identity.Infrastructure.Services;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
     
 public static class IdentityModuleServiceCollectionExtensions
 {
@@ -22,11 +26,11 @@ public static class IdentityModuleServiceCollectionExtensions
         IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("PostgreSqlConnection") 
-            ?? throw new InvalidOperationException("Database connection string was not found.");
+            ?? throw new InvalidOperationException("Database connection string is not configured.");
 
         services.AddIdentityPersistence(connectionString);
         services.AddIdentityServices();
-        services.AddIdentityApiVersioning();
+        services.AddIdentityAuthentication(configuration);
         
         return services;
     }
@@ -70,24 +74,45 @@ public static class IdentityModuleServiceCollectionExtensions
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         
         return services;       
     }
-    
-    private static IServiceCollection AddIdentityApiVersioning(
-        this IServiceCollection services)
+
+    private static IServiceCollection AddIdentityAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.AddApiVersioning(options =>
-        {
-            options.DefaultApiVersion = new ApiVersion(1);
-            options.AssumeDefaultVersionWhenUnspecified = true;
-            options.ReportApiVersions = true;
-        });
+        services.AddOptions<JwtSettings>()
+            .BindConfiguration(JwtSettings.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        var jwtSettings = configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
+            ?? throw new InvalidOperationException("JWT settings are not configured.");
+        
+        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
-        return services;
+        services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+        
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+        
+        return services;      
     }
-
 }

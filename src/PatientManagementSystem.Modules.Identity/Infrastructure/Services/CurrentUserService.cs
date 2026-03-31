@@ -1,9 +1,9 @@
-using System.Security.Claims;
-
 namespace PatientManagementSystem.Modules.Identity.Infrastructure.Services;
 
 using Microsoft.AspNetCore.Http;
 using PatientManagementSystem.Common.Services;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 internal sealed class CurrentUserService : ICurrentUserService
 {
@@ -20,7 +20,7 @@ internal sealed class CurrentUserService : ICurrentUserService
     
     public string UserId =>
         IsAuthenticated 
-            ? (_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) 
+            ? (_httpContextAccessor.HttpContext?.User.FindFirstValue(JwtRegisteredClaimNames.Sub) 
                ?? SystemActor) 
             : SystemActor;
 }

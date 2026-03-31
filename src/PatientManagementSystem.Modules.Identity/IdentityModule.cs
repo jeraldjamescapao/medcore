@@ -16,7 +16,6 @@ public sealed class IdentityModule : IModule
 
     public WebApplication MapEndpoints(WebApplication app)
     {
-        // If needed, map any minimal API endpoints.
         return app;
     }
 }
