@@ -6,13 +6,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using PatientManagementSystem.Common.Configuration;
 using PatientManagementSystem.Common.Services;
 using PatientManagementSystem.Modules.Identity.Application.Abstractions.Authentication;
+using PatientManagementSystem.Modules.Identity.Application.Abstractions.Email;
 using PatientManagementSystem.Modules.Identity.Application.Services;
 using PatientManagementSystem.Modules.Identity.Domain.Roles;
 using PatientManagementSystem.Modules.Identity.Domain.Tokens;
 using PatientManagementSystem.Modules.Identity.Domain.Users;
 using PatientManagementSystem.Modules.Identity.Infrastructure.Authentication;
+using PatientManagementSystem.Modules.Identity.Infrastructure.Email;
 using PatientManagementSystem.Modules.Identity.Infrastructure.Persistence;
 using PatientManagementSystem.Modules.Identity.Infrastructure.Persistence.Repositories;
 using PatientManagementSystem.Modules.Identity.Infrastructure.Services;
@@ -28,8 +31,13 @@ public static class IdentityModuleServiceCollectionExtensions
         var connectionString = configuration.GetConnectionString("PostgreSqlConnection") 
             ?? throw new InvalidOperationException("Database connection string is not configured.");
 
+        services.AddOptions<FrontendSettings>()
+            .BindConfiguration(FrontendSettings.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
         services.AddIdentityPersistence(connectionString);
-        services.AddIdentityServices();
+        services.AddIdentityServices(configuration);
         services.AddIdentityJwt(configuration);
         
         return services;
@@ -51,7 +59,8 @@ public static class IdentityModuleServiceCollectionExtensions
     }
 
     private static IServiceCollection AddIdentityServices(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddDataProtection();
         
@@ -77,6 +86,21 @@ public static class IdentityModuleServiceCollectionExtensions
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IIdentityEmailService, IdentityEmailService>();
+
+        services.AddOptions<IdentityTokenSettings>()
+            .BindConfiguration(IdentityTokenSettings.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        services.Configure<DataProtectionTokenProviderOptions>(options =>
+        {
+            var tokenSettings = configuration.GetSection(IdentityTokenSettings.SectionName)
+                                    .Get<IdentityTokenSettings>()
+                                ?? throw new InvalidOperationException("IdentityTokens settings are not configured.");
+
+            options.TokenLifespan = TimeSpan.FromHours(tokenSettings.EmailConfirmationExpirationInHours);
+        });
         
         return services;       
     }

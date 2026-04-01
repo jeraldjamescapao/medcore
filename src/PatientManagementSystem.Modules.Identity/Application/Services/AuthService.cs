@@ -1,30 +1,41 @@
 namespace PatientManagementSystem.Modules.Identity.Application.Services;
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
+using PatientManagementSystem.Common.Exceptions;
 using PatientManagementSystem.Common.Results;
 using PatientManagementSystem.Modules.Identity.Application.Abstractions.Authentication;
+using PatientManagementSystem.Modules.Identity.Application.Abstractions.Email;
 using PatientManagementSystem.Modules.Identity.Application.Contracts.Authentication;
 using PatientManagementSystem.Modules.Identity.Configuration;
 using PatientManagementSystem.Modules.Identity.Domain.Users;
 using PatientManagementSystem.Modules.Identity.Domain.Tokens;
+using PatientManagementSystem.Modules.Identity.Infrastructure.Persistence;
+using System.Text;
 
 internal sealed class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly IIdentityEmailService _identityEmailService;
+    private readonly IdentityDbContext _dbContext;
     private readonly JwtSettings _jwtSettings;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
         IJwtTokenService jwtTokenService,
         IRefreshTokenRepository refreshTokenRepository,
+        IIdentityEmailService identityEmailService,
+        IdentityDbContext dbContext,
         IOptions<JwtSettings> jwtSettings)
     {
         _userManager = userManager;
         _jwtTokenService = jwtTokenService;
         _refreshTokenRepository = refreshTokenRepository;
+        _identityEmailService = identityEmailService;
+        _dbContext = dbContext;
         _jwtSettings = jwtSettings.Value;
     }
     
@@ -42,26 +53,51 @@ internal sealed class AuthService : IAuthService
             request.BirthDate,
             createdBy: ApplicationUser.SelfRegisteredActor);
         
-        var createResult = await _userManager.CreateAsync(user, request.Password);
-        if (!createResult.Succeeded)
-            return Result<RegisterResponse>.Internal(AuthErrors.RegistrationFailed);
-        
-        var roleResult = await _userManager.AddToRoleAsync(user, Domain.Roles.IdentityRoles.Patient);
-        if (!roleResult.Succeeded)
-            return Result<RegisterResponse>.Internal(AuthErrors.RoleAssignmentFailed);
-
-        var roles = await _userManager.GetRolesAsync(user);
-        var (accessToken, rawRefreshToken) = await IssueTokenPairAsync(user, roles, ct);
-        
-        return Result<RegisterResponse>.Success(new RegisterResponse(
-            user.Id,
-            user.Email!,
-            user.FullName,
-            roles,
-            accessToken)
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync(ct);
+        try
         {
-            RawRefreshToken = rawRefreshToken
-        });
+            var createResult = await _userManager.CreateAsync(user, request.Password);
+            if (!createResult.Succeeded)
+            {
+                await transaction.RollbackAsync(ct);
+                return Result<RegisterResponse>.Internal(AuthErrors.RegistrationFailed);
+            }
+            
+            var roleResult = await _userManager.AddToRoleAsync(user, Domain.Roles.IdentityRoles.Patient);
+            if (!roleResult.Succeeded)
+            {
+                await transaction.RollbackAsync(ct);
+                return Result<RegisterResponse>.Internal(AuthErrors.RoleAssignmentFailed);
+            }
+            
+            var roles = await _userManager.GetRolesAsync(user);
+            var (accessToken, rawRefreshToken) = await IssueTokenPairAsync(user, roles, ct);
+            
+            var encodedToken = await GenerateEncodedConfirmationTokenAsync(user);
+            await _identityEmailService.SendConfirmationEmailAsync(user, encodedToken, ct);
+            
+            await transaction.CommitAsync(ct);
+            
+            return Result<RegisterResponse>.Success(new RegisterResponse(
+                user.Id,
+                user.Email!,
+                user.FullName,
+                roles,
+                accessToken)
+            {
+                RawRefreshToken = rawRefreshToken
+            });
+        }
+        catch (EmailDeliveryException)
+        {
+            await transaction.RollbackAsync(ct);
+            return Result<RegisterResponse>.ServiceUnavailable(AuthErrors.EmailDeliveryFailed);
+        }
+        catch
+        {
+            await transaction.RollbackAsync(ct);
+            throw;
+        }
     }
 
     public async Task<Result<LoginResponse>> LoginAsync(
@@ -167,7 +203,47 @@ internal sealed class AuthService : IAuthService
         await _refreshTokenRepository.RevokeAllForUserAsync(userId, ct);
         return Result<bool>.Success(true);
     }
-    
+
+    public async Task<Result<bool>> ConfirmEmailAsync(
+        Guid userId, string token, CancellationToken ct = default)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+            return Result<bool>.NotFound(AuthErrors.UserNotFound);
+        
+        if (user.EmailConfirmed)
+            return Result<bool>.Conflict(AuthErrors.EmailAlreadyConfirmed);
+        
+        var decodedToken = DecodeToken(token);
+        var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+        if (!result.Succeeded)
+            return Result<bool>.UnprocessableEntity(AuthErrors.InvalidConfirmationToken);
+        
+        return Result<bool>.Success(true);
+    }
+
+    public async Task<Result<bool>> ResendConfirmationEmailAsync(
+        string email, CancellationToken ct = default)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        // Always return success to avoid email enumeration attacks.
+        if (user is null || user.EmailConfirmed)
+            return Result<bool>.Success(true);
+        
+        try
+        {
+            var encodedToken = await GenerateEncodedConfirmationTokenAsync(user);
+            await _identityEmailService.SendConfirmationEmailAsync(user, encodedToken, ct);
+        }
+        catch (EmailDeliveryException)
+        {
+            return Result<bool>.ServiceUnavailable(AuthErrors.EmailDeliveryFailed);
+        }
+
+        return Result<bool>.Success(true);
+    }
+
     private async Task<(string AccessToken, string RawRefreshToken)> IssueTokenPairAsync(
         ApplicationUser user,
         IList<string> roles,
@@ -186,5 +262,17 @@ internal sealed class AuthService : IAuthService
         await _refreshTokenRepository.SaveChangesAsync(ct);
 
         return (accessToken, rawRefreshToken);
+    }
+    
+    private async Task<string> GenerateEncodedConfirmationTokenAsync(ApplicationUser user)
+    {
+        var rawToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        return WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(rawToken));
+    }
+
+    private static string DecodeToken(string token)
+    {
+        var bytes = WebEncoders.Base64UrlDecode(token);
+        return Encoding.UTF8.GetString(bytes);
     }
 }

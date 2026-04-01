@@ -89,6 +89,25 @@ public sealed class AuthController : BaseApiController
         return NoContent();
     }
     
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmailAsync(
+        [FromQuery] Guid userId,
+        [FromQuery] string token,
+        CancellationToken ct)
+    {
+        var result = await _authService.ConfirmEmailAsync(userId, token, ct);
+        return ToActionResult(result);
+    }
+
+    [HttpPost("resend-confirmation-email")]
+    public async Task<IActionResult> ResendConfirmationEmailAsync(
+        [FromBody] ResendConfirmationEmailRequest request,
+        CancellationToken ct)
+    {
+        var result = await _authService.ResendConfirmationEmailAsync(request.Email, ct);
+        return ToActionResult(result);
+    }
+    
     private void AppendRefreshTokenCookie(string rawRefreshToken)
     {
         Response.Cookies.Append(CookieNames.RefreshToken, rawRefreshToken, new CookieOptions
