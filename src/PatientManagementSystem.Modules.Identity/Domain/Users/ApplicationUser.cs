@@ -5,6 +5,8 @@ using PatientManagementSystem.Common.Auditing;
 
 public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity
 {
+    public const string SelfRegisteredActor = "Self";
+    
     public string FirstName { get; private set; } = null!;
     public string LastName { get; private set; } = null!;
     public DateOnly BirthDate { get; private set; }

@@ -20,10 +20,10 @@ public abstract class BaseApiController : ControllerBase
             [ResultErrorType.ServiceUnavailable]  = StatusCodes.Status503ServiceUnavailable,
         };
     
-    protected IActionResult ToActionResult<T>(Result<T> result)
+    protected IActionResult ToActionResult<T>(Result<T> result, int successStatusCode = StatusCodes.Status200OK)
     {
         if (result.IsSuccess) 
-            return StatusCode(StatusCodes.Status200OK, result.Value);
+            return StatusCode(successStatusCode, result.Value);
 
         var error = new { code = result.Error!.Code, message = result.Error.Message };
         

@@ -4,6 +4,9 @@ using PatientManagementSystem.Common.Results;
 
 public static class AuthErrors
 {
+    public static readonly ResultError RegistrationFailed =
+        new("IDENTITY_AUTH_REGISTRATION_FAILED", "Failed to create user account.");
+    
     public static readonly ResultError EmailAlreadyRegistered =
         new("IDENTITY_AUTH_EMAIL_ALREADY_REGISTERED", "Email is already registered.");
 
