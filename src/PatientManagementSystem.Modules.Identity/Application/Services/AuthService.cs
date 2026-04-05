@@ -111,7 +111,7 @@ internal sealed class AuthService : IAuthService
             return Result<LoginResponse>.Unauthorized(AuthErrors.AccountDeactivated);
 
         if (!user.EmailConfirmed)
-            return Result<LoginResponse>.Unauthorized(AuthErrors.EmailNotConfirmed);
+            return Result<LoginResponse>.UnprocessableEntity(AuthErrors.EmailNotConfirmed);
 
         var passwordValid = await _userManager.CheckPasswordAsync(user, request.Password);
         if (!passwordValid)
