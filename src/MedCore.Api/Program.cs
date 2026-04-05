@@ -22,6 +22,7 @@ try
             .ReadFrom.Services(services));
     
     builder.Services.AddOpenApi();
+    builder.Services.AddProblemDetails();
     builder.Services.AddApiVersioning().AddMvc();
     
     builder.Services.RegisterModules(

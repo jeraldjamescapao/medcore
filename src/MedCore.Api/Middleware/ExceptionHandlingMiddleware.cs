@@ -1,12 +1,5 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-
 namespace MedCore.Api.Middleware;
 
-using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 using MedCore.Api.Logging;
 
 public sealed class ExceptionHandlingMiddleware
@@ -41,11 +34,11 @@ public sealed class ExceptionHandlingMiddleware
                 httpContext.Request.Path.Value ?? string.Empty,
                 exception);
 
-            await WriteProblemsDetailsAsync(httpContext);
+            await WriteProblemsDetailsAsync(httpContext, exception);
         }
     }
 
-    private static async Task WriteProblemsDetailsAsync(HttpContext httpContext)
+    private static async Task WriteProblemsDetailsAsync(HttpContext httpContext, Exception exception)
     {
         if (httpContext.Response.HasStarted)
         {
@@ -54,22 +47,26 @@ public sealed class ExceptionHandlingMiddleware
 
         httpContext.Response.Clear();
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        httpContext.Response.ContentType = "application/problem+json";
-
-        var problemDetails = new ProblemDetails
+        
+        var problemDetailsService = httpContext.RequestServices
+            .GetRequiredService<IProblemDetailsService>();
+        
+        await problemDetailsService.WriteAsync(new ProblemDetailsContext
         {
-            Status = StatusCodes.Status500InternalServerError,
-            Title = "Internal Server Error",
-            Detail = "An unexpected error occurred.",
-            Instance = httpContext.Request.Path,
-            Extensions =
+            HttpContext = httpContext,
+            Exception = exception,
+            ProblemDetails =
             {
-                ["traceId"] = httpContext.TraceIdentifier
+                Type = "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+                Title = "Internal Server Error",
+                Status = StatusCodes.Status500InternalServerError,
+                Detail = "An unexpected error occurred.",
+                Instance = httpContext.Request.Path,
+                Extensions =
+                {
+                    ["traceId"] = httpContext.TraceIdentifier
+                }
             }
-        };
-
-        var json = JsonSerializer.Serialize(problemDetails);
-
-        await httpContext.Response.WriteAsync(json);
+        });
     }
 }
