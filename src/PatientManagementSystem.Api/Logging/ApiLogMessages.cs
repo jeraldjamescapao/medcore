@@ -1,4 +1,4 @@
-namespace PatientManagementSystem.Common.Logging;
+namespace PatientManagementSystem.Api.Logging;
 
 public static class ApiLogMessages
 {

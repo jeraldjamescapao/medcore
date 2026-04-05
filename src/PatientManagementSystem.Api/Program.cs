@@ -1,5 +1,5 @@
+using PatientManagementSystem.Api.Middleware;
 using PatientManagementSystem.Common.Configuration;
-using PatientManagementSystem.Common.Middleware;
 using PatientManagementSystem.Common.Modules;
 using PatientManagementSystem.Infrastructure;
 using PatientManagementSystem.Modules.Identity;

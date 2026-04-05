@@ -1,8 +1,8 @@
-namespace PatientManagementSystem.Common.Middleware;
+namespace PatientManagementSystem.Api.Middleware;
 
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using PatientManagementSystem.Common.Logging;
+using PatientManagementSystem.Api.Logging;
 
 public sealed class ExceptionHandlingMiddleware
 {
