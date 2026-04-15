@@ -51,10 +51,10 @@ try
         });
     }
 
+    app.UseHttpsRedirection();
     app.UseMiddleware<ExceptionHandlingMiddleware>();
     app.UseSerilogRequestLogging();
     
-    app.UseHttpsRedirection();
     app.UseAuthentication();
     app.UseAuthorization();
 
