@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-public sealed class RefreshTokenCleanupService : BackgroundService
+internal sealed class RefreshTokenCleanupService : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<RefreshTokenCleanupService> _logger;
