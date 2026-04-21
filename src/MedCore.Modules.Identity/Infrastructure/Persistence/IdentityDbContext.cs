@@ -7,7 +7,7 @@ using MedCore.Modules.Identity.Domain.Roles;
 using MedCore.Modules.Identity.Domain.Tokens; 
 using MedCore.Modules.Identity.Domain.Users;
 
-internal class IdentityDbContext 
+internal sealed class IdentityDbContext 
     : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
 {
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();

@@ -191,7 +191,7 @@ internal sealed class AuthService : IAuthService
         if (string.IsNullOrWhiteSpace(refreshToken))
             return Result<bool>.Success(true);
         
-        var existingToken = await _refreshTokenRepository.GetByTokenAsync(refreshToken, ct);
+        var existingToken = await _refreshTokenRepository.GetByTokenAsync(HashToken(refreshToken), ct);
         if (existingToken is null || !existingToken.IsActive)
             return Result<bool>.Success(true);
         

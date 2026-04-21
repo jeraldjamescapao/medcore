@@ -3,7 +3,6 @@ using MedCore.Common.Configuration;
 using MedCore.Common.Modules;
 using MedCore.Infrastructure;
 using MedCore.Modules.Identity;
-using MedCore.Modules.Identity.Infrastructure.Persistence;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -39,7 +38,7 @@ try
 
     var app = builder.Build();
     
-    await IdentityRoleSeeder.SeedAsync(app.Services);
+    await app.SeedIdentityAsync();
     
     if (app.Environment.IsDevelopment())
     {

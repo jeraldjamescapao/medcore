@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using MedCore.Modules.Identity.Domain.Roles;
 
-public static class IdentityRoleSeeder
+internal static class IdentityRoleSeeder
 {
     public static async Task SeedAsync(IServiceProvider serviceProvider)
     {
