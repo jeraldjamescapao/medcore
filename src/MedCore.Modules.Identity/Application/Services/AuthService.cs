@@ -208,7 +208,7 @@ internal sealed class AuthService : IAuthService
         var newRefreshToken = RefreshToken.Create(
             user.Id,
             existingToken.FamilyId,
-            newRawRefreshToken,
+            HashToken(newRawRefreshToken),
             DateTimeOffset.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationInDays));
 
         existingToken.Revoke();
