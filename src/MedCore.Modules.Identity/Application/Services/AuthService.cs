@@ -104,10 +104,10 @@ internal sealed class AuthService : IAuthService
                 RawRefreshToken = rawRefreshToken
             });
         }
-        catch (EmailDeliveryException)
+        catch (EmailDeliveryException ex)
         {
             await transaction.RollbackAsync(ct);
-            AuthLogMessages.RegisterEmailDeliveryFailed(_logger, request.Email, null);
+            AuthLogMessages.RegisterEmailDeliveryFailed(_logger, request.Email, ex);
             return Result<RegisterResponse>.ServiceUnavailable(AuthErrors.EmailDeliveryFailed);
         }
         catch
@@ -304,9 +304,9 @@ internal sealed class AuthService : IAuthService
             var encodedToken = await GenerateEncodedConfirmationTokenAsync(user);
             await _identityEmailService.SendConfirmationEmailAsync(user, encodedToken, ct);
         }
-        catch (EmailDeliveryException)
+        catch (EmailDeliveryException ex)
         {
-            AuthLogMessages.ResendConfirmationEmailDeliveryFailed(_logger, null);
+            AuthLogMessages.ResendConfirmationEmailDeliveryFailed(_logger, ex);
             return Result<bool>.ServiceUnavailable(AuthErrors.EmailDeliveryFailed);
         }
         
