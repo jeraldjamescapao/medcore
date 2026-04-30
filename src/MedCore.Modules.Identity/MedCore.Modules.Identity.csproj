@@ -21,4 +21,7 @@
       <ProjectReference Include="..\MedCore.Common\MedCore.Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="MedCore.Modules.Identity.Tests" />
+    </ItemGroup>
 </Project>
