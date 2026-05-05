@@ -2,7 +2,7 @@ namespace MedCore.Api.Middleware;
 
 using MedCore.Api.Logging;
 
-public sealed class ExceptionHandlingMiddleware
+internal sealed class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;

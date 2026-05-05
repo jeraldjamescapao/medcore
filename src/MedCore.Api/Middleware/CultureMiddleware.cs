@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using System.IdentityModel.Tokens.Jwt;
 
-public sealed class CultureMiddleware
+internal sealed class CultureMiddleware
 {
     private readonly RequestDelegate _next;
 

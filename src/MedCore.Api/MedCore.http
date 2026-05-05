@@ -125,9 +125,12 @@ Authorization: Bearer {{AccessToken}}
 
 ###
 
-### Users
-
-### GET current user profile
+# ─────────────────────────────────────────
+# Users — Get Current User
+# Returns the authenticated user's profile.
+# Requires: valid Bearer token.
+# Returns: 200 with user profile.
+# ─────────────────────────────────────────
 
 GET https://localhost:7212/api/v1/users/me
 Authorization: Bearer {{AccessToken}}

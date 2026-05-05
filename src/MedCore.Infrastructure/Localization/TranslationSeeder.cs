@@ -6,6 +6,9 @@ using Microsoft.Extensions.Logging;
 
 internal static class TranslationSeeder
 {
+    // Regional cultures (fr-CH, de-CH) are not seeded explicitly.
+    // DbMessageLocalizer resolves them via the fallback chain: fr-CH → fr → en.
+    // To override a regional culture, add an entry here with the specific culture key.
     private static readonly Dictionary<string, Dictionary<string, string>> Seeds = new()
     {
         [SupportedCultures.English] = new()

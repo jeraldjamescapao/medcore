@@ -4,6 +4,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MedCore.Common.Controllers;
+using MedCore.Common.Results;
 using MedCore.Common.Services;
 using MedCore.Modules.Users.Application.Abstractions;
 using MedCore.Modules.Users.Application.Contracts;
@@ -26,7 +27,7 @@ public sealed class UsersController : BaseApiController
     public async Task<IActionResult> GetCurrentUserAsync(CancellationToken ct)
     {
         if (!Guid.TryParse(_currentUserService.UserId, out var userId))
-            return ToActionResult(Common.Results.Result<bool>.Unauthorized(UserErrors.InvalidToken));
+            return ToActionResult(Result<bool>.Unauthorized(UserErrors.InvalidToken));
 
         var result = await _userService.GetCurrentUserAsync(userId, ct);
         return ToActionResult(result);
