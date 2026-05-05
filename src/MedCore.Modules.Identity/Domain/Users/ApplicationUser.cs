@@ -78,6 +78,8 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity
             throw new ArgumentException("FirstName is required.");
         if (string.IsNullOrWhiteSpace(lastName))
             throw new ArgumentException("LastName is required.");
+        if (string.IsNullOrWhiteSpace(modifiedBy))
+            throw new ArgumentException("ModifiedBy is required.");       
         
         FirstName = firstName.Trim();
         LastName = lastName.Trim();
@@ -89,6 +91,8 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity
     {
         if (birthDate > DateOnly.FromDateTime(DateTime.UtcNow))
             throw new ArgumentException("BirthDate cannot be in the future.");
+        if (string.IsNullOrWhiteSpace(modifiedBy))
+            throw new ArgumentException("ModifiedBy is required."); 
         
         BirthDate = birthDate;
         ModifiedAtUtc = DateTimeOffset.UtcNow;   
@@ -97,6 +101,9 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity
     
     public void Deactivate(string modifiedBy)
     {
+        if (string.IsNullOrWhiteSpace(modifiedBy))
+            throw new ArgumentException("ModifiedBy is required."); 
+        
         if (!IsActive) return;
         
         IsActive = false;
@@ -106,6 +113,9 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity
     
     public void Activate(string modifiedBy)
     {
+        if (string.IsNullOrWhiteSpace(modifiedBy))
+            throw new ArgumentException("ModifiedBy is required."); 
+        
         if (IsActive) return;
         
         IsActive = true;
