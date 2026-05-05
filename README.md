@@ -89,6 +89,11 @@ following the Interface Segregation Principle. Email service depends only on
 `IMessageLocalizer`. Startup warmup and admin refresh depend only on
 `ILocalizerCache`. One implementation (`DbMessageLocalizer`) satisfies both.
 
+The data layer uses EF Core. Switching providers requires updating `UseNpgsql`
+to `UseSqlServer` in each `DbContext` registration and regenerating migrations.
+The abstraction is intentionally kept simple. Provider portability is a known
+tradeoff, not an oversight.
+
 ## Getting Started
 
 ### Prerequisites
