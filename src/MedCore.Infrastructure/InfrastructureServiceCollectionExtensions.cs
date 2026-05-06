@@ -1,8 +1,10 @@
 namespace MedCore.Infrastructure;
 
+using MedCore.Common.Caching;
 using MedCore.Common.Localization;
 using MedCore.Common.Services;
 using MedCore.Common.Services.Email;
+using MedCore.Infrastructure.Caching;
 using MedCore.Infrastructure.Localization;
 using MedCore.Infrastructure.Email;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +30,7 @@ public static class InfrastructureServiceCollectionExtensions
 
         services.AddScoped<ITranslationRepository, TranslationRepository>();
         services.AddScoped<ICurrentCultureService, CurrentCultureService>();
+        services.AddSingleton<IUserCultureCache, MemoryUserCultureCache>();
 
         services.AddSingleton<DbMessageLocalizer>();
         services.AddSingleton<IMessageLocalizer>(sp =>

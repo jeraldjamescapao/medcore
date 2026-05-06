@@ -132,7 +132,7 @@ Authorization: Bearer {{AccessToken}}
 # Returns: 200 with user profile.
 # ─────────────────────────────────────────
 
-GET https://localhost:7212/api/v1/users/me
+GET {{MedCore_HostAddress}}/api/v1/users/me
 Authorization: Bearer {{AccessToken}}
 
 ###

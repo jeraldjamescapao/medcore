@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MedCore.Common.Caching;
 using MedCore.Common.Exceptions;
 using MedCore.Common.Localization;
 using MedCore.Common.Results;
@@ -24,6 +25,7 @@ internal sealed class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ICurrentCultureService _currentCultureService;
+    private readonly IUserCultureCache _userCultureCache;
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IIdentityEmailService _identityEmailService;
@@ -33,21 +35,23 @@ internal sealed class AuthService : IAuthService
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
+        ICurrentCultureService currentCultureService,
+        IUserCultureCache userCultureCache,
         IJwtTokenService jwtTokenService,
         IRefreshTokenRepository refreshTokenRepository,
         IIdentityEmailService identityEmailService,
         IIdentityUnitOfWork unitOfWork,
         IOptions<JwtSettings> jwtSettings,
-        ICurrentCultureService currentCultureService,
         ILogger<AuthService> logger)
     {
         _userManager = userManager;
+        _currentCultureService = currentCultureService;
+        _userCultureCache = userCultureCache;
         _jwtTokenService = jwtTokenService;
         _refreshTokenRepository = refreshTokenRepository;
         _identityEmailService = identityEmailService;
         _unitOfWork = unitOfWork;
         _jwtSettings = jwtSettings.Value;
-        _currentCultureService = currentCultureService;
         _logger = logger;
     }
     
@@ -345,6 +349,8 @@ internal sealed class AuthService : IAuthService
 
         user.UpdatePreferredCulture(culture, user.Id.ToString());
         await _userManager.UpdateAsync(user);
+        
+        _userCultureCache.InvalidateForUser(userId);
 
         AuthLogMessages.CultureUpdateSucceeded(_logger, userId, culture, null);
 

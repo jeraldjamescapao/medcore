@@ -59,6 +59,9 @@ public sealed class UpdatePreferredCultureTests : AuthServiceTestBase
         await UserManager
             .Received(1)
             .UpdateAsync(user);
+        UserCultureCache
+            .Received(1)
+            .InvalidateForUser(UserId);
     }
 
     [Fact]
