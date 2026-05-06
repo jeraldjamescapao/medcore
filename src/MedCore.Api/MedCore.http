@@ -2,7 +2,7 @@
 @ContentType = application/json
 
 # Copy an access token from a login or register response and paste it here.
-@AccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1OGQyNzUzNC1jYTE2LTRlMzgtYmI5Yy1kMWE0MzQ1NTZhMWQiLCJlbWFpbCI6ImRheXRvbjQzQGV0aGVyZWFsLmVtYWlsIiwianRpIjoiOGRkYzk2OTktYjM0Mi00MWFkLTlkYmUtYjlkNjFkMTEyODM4IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiUGF0aWVudCIsImV4cCI6MTc3ODA3NzY4MCwiaXNzIjoiTWVkQ29yZSIsImF1ZCI6Ik1lZENvcmUifQ.l8OamPCDRAgupHJsSn9rxJTnW_liumpcqnWlLqwLp_0
+@AccessToken = 
 
 ###
 
