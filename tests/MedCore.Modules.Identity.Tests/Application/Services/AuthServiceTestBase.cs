@@ -1,10 +1,6 @@
 namespace MedCore.Modules.Identity.Tests.Application.Services;
 
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
-using NSubstitute;
+using MedCore.Common.Caching;
 using MedCore.Common.Localization;
 using MedCore.Common.Services;
 using MedCore.Modules.Identity.Application.Abstractions.Authentication;
@@ -15,6 +11,11 @@ using MedCore.Modules.Identity.Configuration;
 using MedCore.Modules.Identity.Domain.Tokens;
 using MedCore.Modules.Identity.Domain.Users;
 using MedCore.Modules.Identity.Tests.Helpers;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using NSubstitute;
 
 public abstract class AuthServiceTestBase
 {
@@ -26,6 +27,7 @@ public abstract class AuthServiceTestBase
     protected readonly IDbContextTransaction Transaction;
     protected readonly IAuthService Sut;
     protected readonly ICurrentCultureService CurrentCultureService;
+    protected readonly IUserCultureCache UserCultureCache;
     
     protected static readonly JwtSettings DefaultJwtSettings = new()
     {
@@ -47,6 +49,7 @@ public abstract class AuthServiceTestBase
         
         CurrentCultureService = Substitute.For<ICurrentCultureService>();
         CurrentCultureService.Culture.Returns(SupportedCultures.Default);
+        UserCultureCache = Substitute.For<IUserCultureCache>();
         
         UnitOfWork
             .BeginTransactionAsync(Arg.Any<CancellationToken>())
@@ -61,6 +64,7 @@ public abstract class AuthServiceTestBase
         Sut = new AuthService(
             UserManager,
             CurrentCultureService,
+            UserCultureCache,
             JwtTokenService,
             RefreshTokenRepository,
             IdentityEmailService,

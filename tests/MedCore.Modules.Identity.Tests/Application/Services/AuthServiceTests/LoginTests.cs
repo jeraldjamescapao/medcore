@@ -23,6 +23,9 @@ public sealed class LoginTests : AuthServiceTestBase
         result.IsFailure.Should().BeTrue();
         result.ErrorType.Should().Be(ResultErrorType.Unauthorized);
         result.Error!.Code.Should().Be("IDENTITY_AUTH_INVALID_CREDENTIALS");
+        UserCultureCache
+            .DidNotReceive()
+            .SetCultureForUser(Arg.Any<Guid>(), Arg.Any<string>());
     }
     
     [Fact]
@@ -36,6 +39,9 @@ public sealed class LoginTests : AuthServiceTestBase
         result.IsFailure.Should().BeTrue();
         result.ErrorType.Should().Be(ResultErrorType.Unauthorized);
         result.Error!.Code.Should().Be("IDENTITY_AUTH_ACCOUNT_DEACTIVATED");
+        UserCultureCache
+            .DidNotReceive()
+            .SetCultureForUser(Arg.Any<Guid>(), Arg.Any<string>());
     }
     
     [Fact]
@@ -49,6 +55,9 @@ public sealed class LoginTests : AuthServiceTestBase
         result.IsFailure.Should().BeTrue();
         result.ErrorType.Should().Be(ResultErrorType.UnprocessableEntity);
         result.Error!.Code.Should().Be("IDENTITY_AUTH_EMAIL_NOT_CONFIRMED");
+        UserCultureCache
+            .DidNotReceive()
+            .SetCultureForUser(Arg.Any<Guid>(), Arg.Any<string>());
     }
     
     [Fact]
@@ -63,6 +72,9 @@ public sealed class LoginTests : AuthServiceTestBase
         result.IsFailure.Should().BeTrue();
         result.ErrorType.Should().Be(ResultErrorType.Unauthorized);
         result.Error!.Code.Should().Be("IDENTITY_AUTH_INVALID_CREDENTIALS");
+        UserCultureCache
+            .DidNotReceive()
+            .SetCultureForUser(Arg.Any<Guid>(), Arg.Any<string>());
     }
     
     [Fact]
@@ -81,5 +93,8 @@ public sealed class LoginTests : AuthServiceTestBase
         result.Value.Roles.Should().ContainSingle().Which.Should().Be("Patient");
         result.Value.AccessToken.Should().Be("access-token");
         result.Value.RawRefreshToken.Should().Be("raw-refresh-token");
+        UserCultureCache
+            .Received(1)
+            .SetCultureForUser(user.Id, Arg.Any<string>());
     }
 }

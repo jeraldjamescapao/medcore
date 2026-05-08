@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MedCore.Common.Caching;
 using MedCore.Common.Exceptions;
 using MedCore.Common.Results;
 using MedCore.Common.Services;
@@ -23,6 +24,7 @@ internal sealed class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ICurrentCultureService _currentCultureService;
+    private readonly IUserCultureCache _userCultureCache;
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IIdentityEmailService _identityEmailService;
@@ -33,6 +35,7 @@ internal sealed class AuthService : IAuthService
     public AuthService(
         UserManager<ApplicationUser> userManager,
         ICurrentCultureService currentCultureService,
+        IUserCultureCache userCultureCache,
         IJwtTokenService jwtTokenService,
         IRefreshTokenRepository refreshTokenRepository,
         IIdentityEmailService identityEmailService,
@@ -42,6 +45,7 @@ internal sealed class AuthService : IAuthService
     {
         _userManager = userManager;
         _currentCultureService = currentCultureService;
+        _userCultureCache = userCultureCache;
         _jwtTokenService = jwtTokenService;
         _refreshTokenRepository = refreshTokenRepository;
         _identityEmailService = identityEmailService;
@@ -157,6 +161,7 @@ internal sealed class AuthService : IAuthService
         var (accessToken, rawRefreshToken) = await IssueTokenPairAsync(user, roles, ct);
         
         var culture = user.PreferredCulture ?? _currentCultureService.Culture;
+        _userCultureCache.SetCultureForUser(user.Id, culture);
         
         AuthLogMessages.LoginSucceeded(_logger, user.Id, user.Email!, null);
         
