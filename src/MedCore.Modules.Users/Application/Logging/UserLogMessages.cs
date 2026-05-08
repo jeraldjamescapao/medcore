@@ -49,17 +49,23 @@ public static class UserLogMessages
     #endregion
     
     #region Update Profile
+    
+    public static readonly Action<ILogger, Guid, Exception?> UpdateProfileUserNotFound =
+        LoggerMessage.Define<Guid>(
+            LogLevel.Warning,
+            new EventId(3007, "UpdateProfileUserNotFound"),
+            "Profile update failed: user {UserId} not found.");
 
     public static readonly Action<ILogger, Guid, Exception?> UpdateProfileFailed =
         LoggerMessage.Define<Guid>(
             LogLevel.Warning,
-            new EventId(3007, "UpdateProfileFailed"),
+            new EventId(3008, "UpdateProfileFailed"),
             "Profile update failed for user {UserId}: identity update returned errors.");
 
     public static readonly Action<ILogger, Guid, Exception?> UpdateProfileSucceeded =
         LoggerMessage.Define<Guid>(
             LogLevel.Information,
-            new EventId(3008, "UpdateProfileSucceeded"),
+            new EventId(3009, "UpdateProfileSucceeded"),
             "Profile updated successfully for user {UserId}.");
 
     #endregion
@@ -69,13 +75,13 @@ public static class UserLogMessages
     public static readonly Action<ILogger, Guid, Exception?> UpdatePhoneFailed =
         LoggerMessage.Define<Guid>(
             LogLevel.Warning,
-            new EventId(3009, "UpdatePhoneFailed"),
+            new EventId(3010, "UpdatePhoneFailed"),
             "Phone number update failed for user {UserId}: identity update returned errors.");
 
     public static readonly Action<ILogger, Guid, Exception?> UpdatePhoneSucceeded =
         LoggerMessage.Define<Guid>(
             LogLevel.Information,
-            new EventId(3010, "UpdatePhoneSucceeded"),
+            new EventId(3011, "UpdatePhoneSucceeded"),
             "Phone number updated successfully for user {UserId}.");
 
     #endregion

@@ -79,7 +79,7 @@ internal sealed class UserService : IUserService
         var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user is null)
         {
-            UserLogMessages.UpdateProfileFailed(_logger, userId, null);
+            UserLogMessages.UpdateProfileUserNotFound(_logger, userId, null);
             return Result<UserResponse>.NotFound(UserErrors.UserNotFound);
         }
 

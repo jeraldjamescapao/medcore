@@ -52,7 +52,7 @@ public sealed class UpdateProfileTests : UserServiceTestBase
 
         result.IsFailure.Should().BeTrue();
         result.ErrorType.Should().Be(ResultErrorType.Internal);
-        result.Error!.Code.Should().Be("USERS_UPDATE_FAILED");
+        result.Error!.Code.Should().Be("USERS_PROFILE_UPDATE_FAILED");
     }
     
     [Fact]

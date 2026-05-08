@@ -17,7 +17,7 @@ public static class UserErrors
         new("USERS_CULTURE_UPDATE_FAILED", "Failed to update culture.");
     
     public static readonly ResultError ProfileUpdateFailed =
-        new("USERS_UPDATE_FAILED", "Failed to update user profile.");
+        new("USERS_PROFILE_UPDATE_FAILED", "Failed to update user profile.");
 
     public static readonly ResultError PhoneUpdateFailed =
         new("USERS_PHONE_UPDATE_FAILED", "Failed to update phone number.");
