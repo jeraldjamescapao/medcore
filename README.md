@@ -58,7 +58,7 @@ knowing when and why to use it.
 
 ### Tests
 
-43 unit tests total across two test projects.
+44 unit tests total across two test projects.
 
 **AuthService — 31 tests, 7 flows**
 - `RegisterTests` — email conflict, user creation failure, role assignment failure, email delivery failure, no culture defaults to null, valid culture is set, success
@@ -69,9 +69,9 @@ knowing when and why to use it.
 - `ConfirmEmailTests` — user not found, already confirmed, invalid token, success
 - `ResendConfirmationEmailTests` — user not found (silent), already confirmed (silent), email delivery failure, success
 
-**UserService — 12 tests, 4 flows**
+**UserService — 13 tests, 4 flows**
 - `GetCurrentUserTests` — user not found, user exists with correct shape
-- `UpdateCultureTests` — unsupported culture, user not found, valid base culture, valid regional culture
+- `UpdateCultureTests` — unsupported culture, identity update fails, user not found, valid base culture, valid regional culture
 - `UpdateProfileTests` — user not found, identity update fails, valid request returns updated profile
 - `UpdatePhoneTests` — user not found, identity update fails, valid phone succeeds
 
@@ -174,7 +174,7 @@ From the solution root:
 dotnet test
 ```
 
-Runs 43 unit tests across all `AuthService` and `UserService` flows.
+Runs 44 unit tests across all `AuthService` and `UserService` flows.
 
 ### API docs
 
