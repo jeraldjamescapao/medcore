@@ -1,6 +1,7 @@
 namespace MedCore.Api.Middleware;
 
 using MedCore.Api.Logging;
+using MedCore.Common.Exceptions;
 
 internal sealed class ExceptionHandlingMiddleware
 {
@@ -26,6 +27,17 @@ internal sealed class ExceptionHandlingMiddleware
             // Client disconnected...
             httpContext.Response.StatusCode = 499;
         }
+        catch (DomainException domainException)
+        {
+            ApiLogMessages.DomainRuleViolation(
+                _logger,
+                httpContext.TraceIdentifier,
+                httpContext.Request.Path.Value ?? string.Empty,
+                domainException.Code,
+                domainException);
+            
+            await WriteDomainProblemDetailsAsync(httpContext, domainException);
+        }
         catch (Exception exception)
         {
             ApiLogMessages.UnhandledException(
@@ -34,11 +46,46 @@ internal sealed class ExceptionHandlingMiddleware
                 httpContext.Request.Path.Value ?? string.Empty,
                 exception);
 
-            await WriteProblemDetailsAsync(httpContext, exception);
+            await WriteUnhandledProblemDetailsAsync(httpContext, exception);
         }
     }
 
-    private static async Task WriteProblemDetailsAsync(HttpContext httpContext, Exception exception)
+    private static async Task WriteDomainProblemDetailsAsync(
+        HttpContext httpContext, DomainException domainException)
+    {
+        if (httpContext.Response.HasStarted)
+        {
+            return;
+        }
+
+        httpContext.Response.Clear();
+        httpContext.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
+        
+        var problemDetailsService = httpContext.RequestServices
+            .GetRequiredService<IProblemDetailsService>();
+        
+        await problemDetailsService.WriteAsync(new ProblemDetailsContext
+        {
+            HttpContext = httpContext,
+            Exception = domainException,
+            ProblemDetails =
+            {
+                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.21",
+                Title = "Unprocessable Content",
+                Status = StatusCodes.Status422UnprocessableEntity,
+                Detail = domainException.Message,
+                Instance = httpContext.Request.Path,
+                Extensions =
+                {
+                    ["traceId"] = httpContext.TraceIdentifier,
+                    ["code"] = domainException.Code
+                }
+            }
+        });
+    }
+
+    private static async Task WriteUnhandledProblemDetailsAsync(
+        HttpContext httpContext, Exception exception)
     {
         if (httpContext.Response.HasStarted)
         {

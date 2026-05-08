@@ -1,5 +1,7 @@
 namespace MedCore.Modules.Identity.Domain.Tokens;
 
+using MedCore.Common.Exceptions;
+
 public sealed class RefreshToken
 {
     public Guid Id { get; private set; }
@@ -38,13 +40,13 @@ public sealed class RefreshToken
         DateTimeOffset expiresAtUtc)
     {
         if (userId == Guid.Empty)
-            throw new ArgumentException("UserId cannot be empty.");
+            throw new DomainException("DOMAIN_TOKEN_INVALID_USER_ID", "UserId cannot be empty.");
         if (familyId == Guid.Empty)
-            throw new ArgumentException("FamilyId cannot be empty.");
+            throw new DomainException("DOMAIN_TOKEN_INVALID_FAMILY_ID", "FamilyId cannot be empty.");
         if (string.IsNullOrEmpty(token))
-            throw new ArgumentException("Token cannot be null or empty.");
+            throw new DomainException("DOMAIN_TOKEN_INVALID_TOKEN", "Token cannot be null or empty.");
         if (expiresAtUtc <= DateTimeOffset.UtcNow)
-            throw new ArgumentException("ExpiresAtUtc must be in the future.");
+            throw new DomainException("DOMAIN_TOKEN_INVALID_EXPIRY", "ExpiresAtUtc must be in the future.");
         
         return new RefreshToken(userId, familyId, token, expiresAtUtc);
     }
@@ -58,7 +60,7 @@ public sealed class RefreshToken
     public void MarkReplacedBy(Guid newTokenId)
     {
         if (newTokenId == Guid.Empty)
-            throw new ArgumentException("New token ID cannot be empty.");
+            throw new DomainException("DOMAIN_TOKEN_INVALID_REPLACEMENT_ID", "New token ID cannot be empty.");
         
         ReplacedByTokenId = newTokenId;
     }
