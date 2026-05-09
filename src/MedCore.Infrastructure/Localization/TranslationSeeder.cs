@@ -53,6 +53,8 @@ internal static class TranslationSeeder
 
         logger.LogInformation("Seeding translations...");
 
+        var existingKeys = await repository.GetAllKeysAsync();
+        
         var seeded = 0;
         var skipped = 0;
 
@@ -60,13 +62,13 @@ internal static class TranslationSeeder
         {
             foreach (var (key, value) in keys)
             {
-                if (await repository.ExistsAsync(culture, key))
+                if (existingKeys.Contains((culture, key)))
                 {
                     skipped++;
                     continue;
                 }
 
-                await repository.AddAsync(new Translation(culture, key, value));
+                await repository.AddAsync(culture, key, value);
                 seeded++;
             }
         }

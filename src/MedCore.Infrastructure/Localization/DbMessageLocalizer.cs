@@ -57,22 +57,13 @@ internal sealed class DbMessageLocalizer : IMessageLocalizer, ILocalizerCache
         var repository = scope.ServiceProvider
             .GetRequiredService<ITranslationRepository>();
 
-        var all = await repository.GetAllAsync(ct);
-
-        var grouped = all
-            .GroupBy(t => t.Culture)
-            .ToDictionary(
-                g => g.Key,
-                g => (IReadOnlyDictionary<string, string>)
-                    g.ToDictionary(t => t.Key, t => t.Value));
-
-        _cache.Set(
-            CacheKeys.Translations,
-            (IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>>)grouped);
+        var grouped = await repository.GetAllGroupedAsync(ct);
+        
+        _cache.Set(CacheKeys.Translations, grouped);
 
         _logger.LogInformation(
-            "Translation cache loaded: {EntryCount} entries across {CultureCount} culture(s).",
-            all.Count, grouped.Count);
+            "Translation cache loaded: {CultureCount} culture(s).",
+            grouped.Count);
     }
     
     public void InvalidateCache()
