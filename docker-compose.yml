@@ -1,6 +1,6 @@
 services:
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mcr.microsoft.com/azure-sql-edge
     container_name: medcore-sqlserver
     environment:
       SA_PASSWORD: "MedCore_Dev_2024!"
@@ -9,7 +9,7 @@ services:
     ports:
       - "1433:1433"
     volumes:
-      - medcore_sqlserver_data:/var/lib/sqlserver/data
+      - medcore_sqlserver_data:/var/opt/mssql
 
   seq:
     image: datalust/seq:latest

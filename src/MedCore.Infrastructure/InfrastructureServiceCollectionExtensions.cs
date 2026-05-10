@@ -23,7 +23,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddDbContext<LocalizationDbContext>(options =>
         {
             options.UseSqlServer(connectionString,
-                o => o.MigrationsAssembly("MedCore.Modules.Infrastructure"));
+                o => o.MigrationsAssembly("MedCore.Infrastructure"));
         });
         
         services.AddMemoryCache();
