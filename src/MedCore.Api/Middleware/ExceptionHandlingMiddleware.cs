@@ -6,13 +6,16 @@ using MedCore.Common.Exceptions;
 internal sealed class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly IProblemDetailsService _problemDetailsService;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
     
     public ExceptionHandlingMiddleware(
         RequestDelegate next,
+        IProblemDetailsService problemDetailsService,
         ILogger<ExceptionHandlingMiddleware> logger)
     {
         _next = next;
+        _problemDetailsService = problemDetailsService;
         _logger = logger;
     }
     
@@ -50,7 +53,7 @@ internal sealed class ExceptionHandlingMiddleware
         }
     }
 
-    private static async Task WriteDomainProblemDetailsAsync(
+    private async Task WriteDomainProblemDetailsAsync(
         HttpContext httpContext, DomainException domainException)
     {
         if (httpContext.Response.HasStarted)
@@ -61,10 +64,7 @@ internal sealed class ExceptionHandlingMiddleware
         httpContext.Response.Clear();
         httpContext.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
         
-        var problemDetailsService = httpContext.RequestServices
-            .GetRequiredService<IProblemDetailsService>();
-        
-        await problemDetailsService.WriteAsync(new ProblemDetailsContext
+        await _problemDetailsService.WriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,
             Exception = domainException,
@@ -84,7 +84,7 @@ internal sealed class ExceptionHandlingMiddleware
         });
     }
 
-    private static async Task WriteUnhandledProblemDetailsAsync(
+    private async Task WriteUnhandledProblemDetailsAsync(
         HttpContext httpContext, Exception exception)
     {
         if (httpContext.Response.HasStarted)
@@ -95,10 +95,7 @@ internal sealed class ExceptionHandlingMiddleware
         httpContext.Response.Clear();
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
         
-        var problemDetailsService = httpContext.RequestServices
-            .GetRequiredService<IProblemDetailsService>();
-        
-        await problemDetailsService.WriteAsync(new ProblemDetailsContext
+        await _problemDetailsService.WriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,
             Exception = exception,
