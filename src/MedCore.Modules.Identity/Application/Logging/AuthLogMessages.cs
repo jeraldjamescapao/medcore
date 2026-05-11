@@ -179,13 +179,13 @@ internal static class AuthLogMessages
     #endregion
     
     #region Refresh Token Cleanup
-
+    
     public static readonly Action<ILogger, int, Exception?> RefreshTokenCleanupStarted =
         LoggerMessage.Define<int>(
             LogLevel.Information,
             new EventId(2060, "RefreshTokenCleanupStarted"),
-            "Refresh token cleanup service started. First run is immediate. Interval: every {IntervalInHours} hour(s).");
-
+            "Refresh token cleanup service started. Interval: every {IntervalInHours} hour(s).");
+    
     public static readonly Action<ILogger, int, DateTimeOffset, Exception?> RefreshTokenCleanupSucceeded =
         LoggerMessage.Define<int, DateTimeOffset>(
             LogLevel.Information,
