@@ -36,7 +36,7 @@ internal static class AdminUserSeeder
             email: email,
             firstName: firstName,
             lastName: lastName,
-            birthDate: new DateOnly(2026, 3, 16),
+            birthDate: new DateOnly(1990, 1, 1),
             createdBy: SystemActors.System);
 
         user.EmailConfirmed = true;

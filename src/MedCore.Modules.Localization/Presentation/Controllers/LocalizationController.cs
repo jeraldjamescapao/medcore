@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiVersion("1")]
 [Route("api/v{version:apiVersion}/translations")]
-[Authorize]
 public sealed class LocalizationController : BaseApiController
 {
     private readonly ITranslationService _translationService;
