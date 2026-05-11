@@ -8,4 +8,5 @@ public interface IModule
 {
     IServiceCollection RegisterModule(IServiceCollection services, IConfiguration configuration);
     WebApplication MapEndpoints(WebApplication app);
+    Task RunStartupTasksAsync(WebApplication app) => Task.CompletedTask;
 }

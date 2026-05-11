@@ -44,4 +44,12 @@ public static class ModuleExtensions
                 
         return app;
     }
+    
+    public static async Task RunModuleStartupTasksAsync(this WebApplication app)
+    {
+        var registry = app.Services.GetRequiredService<ModuleRegistry>();
+
+        foreach (var module in registry.Modules)
+            await module.RunStartupTasksAsync(app);
+    }
 }

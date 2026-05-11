@@ -3,9 +3,7 @@ using MedCore.Common.Configuration;
 using MedCore.Common.Modules;
 using MedCore.Infrastructure.Configuration;
 using MedCore.Modules.Identity;
-using MedCore.Modules.Identity.Configuration;
 using MedCore.Modules.Localization;
-using MedCore.Modules.Localization.Configuration;
 using MedCore.Modules.Users;
 using Scalar.AspNetCore;
 using Serilog;
@@ -44,9 +42,7 @@ try
 
     var app = builder.Build();
     
-    await app.SeedIdentityAsync();
-    await app.SeedTranslationsAsync();
-    await app.WarmUpLocalizerAsync();
+    await app.RunModuleStartupTasksAsync();
     
     if (app.Environment.IsDevelopment())
     {
