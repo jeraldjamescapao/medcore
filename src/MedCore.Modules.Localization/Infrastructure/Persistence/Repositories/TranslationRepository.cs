@@ -1,6 +1,5 @@
 namespace MedCore.Modules.Localization.Infrastructure.Persistence.Repositories;
 
-using MedCore.Common.Authorization;
 using MedCore.Modules.Localization.Application.Abstractions;
 using MedCore.Modules.Localization.Domain;
 using Microsoft.EntityFrameworkCore;

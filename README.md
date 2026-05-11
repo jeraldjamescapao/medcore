@@ -204,7 +204,7 @@ and override the `Email` section in `appsettings.Development.json`.
 A default admin account is seeded on first startup for reviewer convenience:
 
 - **Email**: admin@medcore.dev
-- **Password**: Admin_MedCore_2024!
+- **Password**: Admin_MedCore_2026!
 
 Use this account to log in and test the translation management endpoints.
 
