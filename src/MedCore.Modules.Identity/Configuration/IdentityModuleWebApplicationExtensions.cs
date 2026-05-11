@@ -8,5 +8,6 @@ public static class IdentityModuleWebApplicationExtensions
     public static async Task SeedIdentityAsync(this WebApplication app)
     {
         await IdentityRoleSeeder.SeedAsync(app.Services);
+        await AdminUserSeeder.SeedAsync(app.Services);
     }
 }

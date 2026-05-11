@@ -155,8 +155,8 @@ dotnet run --project src/MedCore.Api/MedCore.Api.csproj --launch-profile https
 
 The API will be available at `https://localhost:7212`.
 
-On startup, the app seeds roles and translations automatically and loads
-the translation cache before accepting requests.
+On startup, the app seeds roles, the default admin account, and translations automatically,
+then loads the translation cache before accepting requests.
 
 ### Run the tests
 
@@ -193,6 +193,15 @@ The app uses Ethereal Email for development. No real emails are delivered.
 Credentials in `appsettings.json` are intentional for reviewer convenience.
 To use your own Ethereal account, create a free one at https://ethereal.email
 and override the `Email` section in `appsettings.Development.json`.
+
+### Default admin account
+
+A default admin account is seeded on first startup for reviewer convenience:
+
+- **Email**: admin@medcore.dev
+- **Password**: Admin_MedCore_2024!
+
+Use this account to log in and test the translation management endpoints.
 
 ## Status
 

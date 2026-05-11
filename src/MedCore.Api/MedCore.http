@@ -2,7 +2,7 @@
 @ContentType = application/json
 
 # Copy an access token from a login or register response and paste it here.
-@AccessToken = 
+@AccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMTA2NTU1Zi01MjQ3LTRjMzEtYTcyNy0yOWRmZDYwZmFkMTAiLCJlbWFpbCI6ImFkbWluQG1lZGNvcmUuZGV2IiwianRpIjoiMDA3MmRiNmYtY2U2MC00Nzk0LWJjYzYtODRhNThiZTQ4NGQ3IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQWRtaW4iLCJleHAiOjE3Nzg0OTQ3MDIsImlzcyI6Ik1lZENvcmUiLCJhdWQiOiJNZWRDb3JlIn0.rs0q3O-f1gUEbT4T9ZdMLnL_hvAoA-_EZ7xSTA_U8GY
 
 ###
 
@@ -12,6 +12,23 @@
 
 GET {{MedCore_HostAddress}}/
 Accept: text/plain
+
+###
+
+# ─────────────────────────────────────────
+# Auth — Login as Seeded Admin
+# Use this to get an Admin Bearer token for testing admin endpoints.
+# Credentials match the AdminSeed section in appsettings.json.
+# Returns: 200 with access token.
+# ─────────────────────────────────────────
+
+POST {{MedCore_HostAddress}}/api/v1/auth/login
+Content-Type: {{ContentType}}
+
+{
+  "email": "admin@medcore.dev",
+  "password": "Admin_MedCore_2026!"
+}
 
 ###
 
