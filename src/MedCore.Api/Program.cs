@@ -2,6 +2,7 @@ using MedCore.Api.Middleware;
 using MedCore.Common.Configuration;
 using MedCore.Common.Modules;
 using MedCore.Infrastructure.Configuration;
+using MedCore.Modules.CodeItems;
 using MedCore.Modules.Identity;
 using MedCore.Modules.Localization;
 using MedCore.Modules.Users;
@@ -31,7 +32,8 @@ try
         builder.Configuration,
         typeof(IdentityModule).Assembly,
         typeof(UsersModule).Assembly,
-        typeof(LocalizationModule).Assembly);
+        typeof(LocalizationModule).Assembly,
+        typeof(CodeItemsModule).Assembly);
 
     builder.Services.AddInfrastructure();
 
