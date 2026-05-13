@@ -24,20 +24,10 @@ resolved from the JWT token instead of client input to prevent IDOR.
 with explicit admin-triggered refresh and a culture fallback chain (e.g. `fr-CH → fr → en`).
 Admins can create, update, and soft-delete translations without a code change or restart.
 
-**CodeItems** — admin-managed healthcare reference data
-(appointment types, patient classifications, doctor roles, and more).
-
-Categories and items support activation, deactivation,
-soft delete, and sort order control.
-
-Code items and categories use the dedicated `CodeItems.Translations` table
-for multilingual labels, resolved per request via `ICurrentCultureService`.
-
-Consumer endpoints return active items with culture-resolved labels and fall back
-to English when no translation exists for the requested culture.
-
-Seed data covers Swiss clinic and hospital conventions across English,
-French, and German.
+**CodeItems** — admin-managed healthcare reference data (appointment types, patient classifications, doctor roles, and more). 
+Categories and items are multilingual, with labels resolved per request via ICurrentCultureService and a fallback to English. 
+Admins control activation, deactivation, soft delete, and sort order without a code change or restart. 
+Seed data covers Swiss clinic and hospital conventions in English, French, and German.
 
 ## Tests
 
