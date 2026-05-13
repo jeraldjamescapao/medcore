@@ -45,6 +45,9 @@ public sealed class CreateItemTests : CodeItemServiceTestBase
         await Repository
             .DidNotReceive()
             .AddItemAsync(Arg.Any<CodeItem>(), Arg.Any<CancellationToken>());
+        await Repository
+            .DidNotReceive()
+            .SaveChangesAsync(Arg.Any<CancellationToken>());
     }
     
     [Fact]

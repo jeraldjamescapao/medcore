@@ -49,8 +49,8 @@ public sealed class DeleteItemTests : CodeItemServiceTestBase
             .Returns(item);
 
         var translation1 = CreateTranslation(entityId: 1, culture: "en");
-        var translation2 = CreateTranslation(entityId: 2, culture: "fr");
-        var translation3 = CreateTranslation(entityId: 3, culture: "de");
+        var translation2 = CreateTranslation(entityId: 1, culture: "fr");
+        var translation3 = CreateTranslation(entityId: 1, culture: "de");
         
         Repository
             .GetTranslationsByEntityAsync(

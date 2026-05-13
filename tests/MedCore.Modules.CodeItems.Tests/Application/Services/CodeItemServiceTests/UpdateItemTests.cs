@@ -40,6 +40,9 @@ public sealed class UpdateItemTests : CodeItemServiceTestBase
         result.IsFailure.Should().BeTrue();
         result.ErrorType.Should().Be(ResultErrorType.UnprocessableEntity);
         result.Error!.Code.Should().Be("CODEITEMS_ITEM_NOT_EDITABLE");
+        await Repository
+            .DidNotReceive()
+            .SaveChangesAsync(Arg.Any<CancellationToken>());
     }
     
     [Fact]
