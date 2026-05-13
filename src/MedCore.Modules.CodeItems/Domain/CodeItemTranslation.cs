@@ -98,6 +98,18 @@ internal sealed class CodeItemTranslation : IAuditableEntity
         
         var trimmedLabel = label.Trim();
         
+        if (trimmedLabel.Length > LabelMaxLength)
+            throw new DomainException(
+                "DOMAIN_CODEITEMTRANSLATION_INVALID_LABEL",
+                $"Label cannot exceed {LabelMaxLength} characters.");
+        
+        var trimmedDescription = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        
+        if (trimmedDescription?.Length > DescriptionMaxLength)
+            throw new DomainException(
+                "DOMAIN_CODEITEMTRANSLATION_INVALID_DESCRIPTION",
+                $"Description cannot exceed {DescriptionMaxLength} characters.");
+        
         if (string.IsNullOrWhiteSpace(createdBy))
             throw new DomainException(
                 "DOMAIN_CODEITEMTRANSLATION_INVALID_CREATED_BY",
@@ -108,7 +120,7 @@ internal sealed class CodeItemTranslation : IAuditableEntity
             entityId,
             trimmedCulture,
             trimmedLabel,
-            string.IsNullOrWhiteSpace(description) ? null : description.Trim(),
+            trimmedDescription,
             isSystemDefined,
             createdBy);
     }
@@ -122,13 +134,25 @@ internal sealed class CodeItemTranslation : IAuditableEntity
         
         var trimmedLabel = label.Trim();
         
+        if (trimmedLabel.Length > LabelMaxLength)
+            throw new DomainException(
+                "DOMAIN_CODEITEMTRANSLATION_INVALID_LABEL",
+                $"Label cannot exceed {LabelMaxLength} characters.");
+        
+        var trimmedDescription = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        
+        if (trimmedDescription?.Length > DescriptionMaxLength)
+            throw new DomainException(
+                "DOMAIN_CODEITEMTRANSLATION_INVALID_DESCRIPTION",
+                $"Description cannot exceed {DescriptionMaxLength} characters.");
+        
         if (string.IsNullOrWhiteSpace(modifiedBy))
             throw new DomainException(
                 "DOMAIN_CODEITEMTRANSLATION_INVALID_MODIFIED_BY",
                 "ModifiedBy is required.");
 
         Label         = trimmedLabel;
-        Description   = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        Description   = trimmedDescription;
         IsActive      = true;
         ModifiedAtUtc = DateTimeOffset.UtcNow;
         ModifiedBy    = modifiedBy;
