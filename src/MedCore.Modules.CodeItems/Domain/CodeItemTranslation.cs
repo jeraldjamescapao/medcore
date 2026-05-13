@@ -72,7 +72,7 @@ internal sealed class CodeItemTranslation : IAuditableEntity
         if (entityType != EntityTypeCategory && entityType != EntityTypeItem)
             throw new DomainException(
                 "DOMAIN_CODEITEMTRANSLATION_INVALID_ENTITY_TYPE",
-                "EntityType must be '{EntityTypeCategory}' or '{EntityTypeItem}'.");
+                $"EntityType must be '{EntityTypeCategory}' or '{EntityTypeItem}'.");
         
         if (entityId <= 0)
             throw new DomainException(
