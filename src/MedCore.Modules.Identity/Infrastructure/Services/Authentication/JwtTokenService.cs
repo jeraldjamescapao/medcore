@@ -1,4 +1,4 @@
-namespace MedCore.Modules.Identity.Infrastructure.Authentication;
+namespace MedCore.Modules.Identity.Infrastructure.Services.Authentication;
 
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;

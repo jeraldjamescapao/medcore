@@ -10,7 +10,8 @@ using MedCore.Common.Http;
 using MedCore.Common.Results;
 using MedCore.Common.Services;
 using MedCore.Modules.Identity.Application.Abstractions.Authentication;
-using MedCore.Modules.Identity.Application.Contracts.Authentication;
+using MedCore.Modules.Identity.Application.Contracts.Authentication.Requests;
+using MedCore.Modules.Identity.Application.Errors;
 using MedCore.Modules.Identity.Configuration;
 
 [ApiVersion("1")]

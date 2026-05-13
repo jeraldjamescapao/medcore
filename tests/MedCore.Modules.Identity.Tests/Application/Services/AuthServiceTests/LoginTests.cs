@@ -3,7 +3,7 @@ namespace MedCore.Modules.Identity.Tests.Application.Services.AuthServiceTests;
 using NSubstitute;
 using FluentAssertions;
 using MedCore.Common.Results;
-using MedCore.Modules.Identity.Application.Contracts.Authentication;
+using MedCore.Modules.Identity.Application.Contracts.Authentication.Requests;
 using MedCore.Modules.Identity.Domain.Users;
 using Xunit;
 

@@ -1,4 +1,4 @@
-namespace MedCore.Modules.Identity.Infrastructure.Persistence;
+namespace MedCore.Modules.Identity.Infrastructure.Persistence.Logging;
 
 using Microsoft.Extensions.Logging;
 

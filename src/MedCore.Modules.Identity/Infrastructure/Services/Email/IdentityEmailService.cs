@@ -1,4 +1,4 @@
-namespace MedCore.Modules.Identity.Infrastructure.Email;
+namespace MedCore.Modules.Identity.Infrastructure.Services.Email;
 
 using Microsoft.Extensions.Options;
 using MedCore.Common.Configuration;

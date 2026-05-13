@@ -3,6 +3,7 @@ namespace MedCore.Modules.Identity;
 using MedCore.Common.Modules;
 using MedCore.Modules.Identity.Configuration;
 using MedCore.Modules.Identity.Infrastructure.Persistence;
+using MedCore.Modules.Identity.Infrastructure.Persistence.Seeding;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

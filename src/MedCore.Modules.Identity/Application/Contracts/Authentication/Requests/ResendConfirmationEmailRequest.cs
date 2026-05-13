@@ -1,4 +1,4 @@
-namespace MedCore.Modules.Identity.Application.Contracts.Authentication;
+namespace MedCore.Modules.Identity.Application.Contracts.Authentication.Requests;
 
 using System.ComponentModel.DataAnnotations;
 

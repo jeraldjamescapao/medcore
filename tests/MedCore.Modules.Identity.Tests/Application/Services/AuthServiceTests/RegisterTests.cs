@@ -6,7 +6,7 @@ using FluentAssertions;
 using MedCore.Common.Localization;
 using MedCore.Common.Results;
 using MedCore.Common.Exceptions;
-using MedCore.Modules.Identity.Application.Contracts.Authentication;
+using MedCore.Modules.Identity.Application.Contracts.Authentication.Requests;
 using MedCore.Modules.Identity.Domain.Users;
 using Xunit;
 

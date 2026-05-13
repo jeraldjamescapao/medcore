@@ -2,6 +2,8 @@ namespace MedCore.Modules.Identity.Application.Abstractions.Authentication;
 
 using MedCore.Common.Results;
 using MedCore.Modules.Identity.Application.Contracts.Authentication;
+using MedCore.Modules.Identity.Application.Contracts.Authentication.Requests;
+using MedCore.Modules.Identity.Application.Contracts.Authentication.Responses;
 
 public interface IAuthService
 {

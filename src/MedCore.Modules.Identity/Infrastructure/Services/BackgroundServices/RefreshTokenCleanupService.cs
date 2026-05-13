@@ -1,4 +1,4 @@
-namespace MedCore.Modules.Identity.Infrastructure.BackgroundServices;
+namespace MedCore.Modules.Identity.Infrastructure.Services.BackgroundServices;
 
 using MedCore.Modules.Identity.Application.Logging;
 using MedCore.Modules.Identity.Configuration;

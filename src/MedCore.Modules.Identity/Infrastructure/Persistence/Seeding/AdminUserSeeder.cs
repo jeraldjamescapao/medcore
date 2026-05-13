@@ -1,7 +1,8 @@
-namespace MedCore.Modules.Identity.Infrastructure.Persistence;
+namespace MedCore.Modules.Identity.Infrastructure.Persistence.Seeding;
 
 using MedCore.Common.Authorization;
 using MedCore.Modules.Identity.Domain.Users;
+using MedCore.Modules.Identity.Infrastructure.Persistence.Logging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
