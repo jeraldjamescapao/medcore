@@ -444,6 +444,9 @@ internal sealed class CodeItemService : ICodeItemService
 
         if (existing is not null)
         {
+            if (!existing.IsActive)
+                existing.Reactivate(_currentUserService.UserId);
+            
             existing.Update(request.Label, request.Description, _currentUserService.UserId);
             await _repository.SaveChangesAsync(ct);
             return Result<TranslationResponse>.Success(MapTranslation(existing));

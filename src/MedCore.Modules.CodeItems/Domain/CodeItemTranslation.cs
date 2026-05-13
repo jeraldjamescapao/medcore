@@ -153,7 +153,6 @@ internal sealed class CodeItemTranslation : IAuditableEntity
 
         Label         = trimmedLabel;
         Description   = trimmedDescription;
-        IsActive      = true;
         ModifiedAtUtc = DateTimeOffset.UtcNow;
         ModifiedBy    = modifiedBy;
     }
@@ -168,6 +167,20 @@ internal sealed class CodeItemTranslation : IAuditableEntity
         if (!IsActive) return;
 
         IsActive      = false;
+        ModifiedAtUtc = DateTimeOffset.UtcNow;
+        ModifiedBy    = modifiedBy;
+    }
+    
+    public void Reactivate(string modifiedBy)
+    {
+        if (string.IsNullOrWhiteSpace(modifiedBy))
+            throw new DomainException(
+                "DOMAIN_CODEITEMTRANSLATION_INVALID_MODIFIED_BY",
+                "ModifiedBy is required.");
+
+        if (IsActive) return;
+
+        IsActive      = true;
         ModifiedAtUtc = DateTimeOffset.UtcNow;
         ModifiedBy    = modifiedBy;
     }
