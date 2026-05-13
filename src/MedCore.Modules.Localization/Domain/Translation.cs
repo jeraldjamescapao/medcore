@@ -8,6 +8,7 @@ internal sealed class Translation : IAuditableEntity
 {
     public const int KeyMaxLength = 200;
     public const int CultureMaxLength = 10;
+    public const int DescriptionMaxLength = 500;
     
     public long Id { get; private set; }
     public string Culture { get; private set; } = null!;
@@ -59,11 +60,20 @@ internal sealed class Translation : IAuditableEntity
         var trimmedCulture = culture.Trim();
         var trimmedKey = key.Trim();
         var trimmedValue = value.Trim();
+        var trimmedDescription = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        
+        if (trimmedDescription?.Length > DescriptionMaxLength)
+            throw new DomainException(
+                "DOMAIN_TRANSLATION_INVALID_DESCRIPTION",
+                $"Description cannot exceed {DescriptionMaxLength} characters.");
         
         if (!SupportedCultures.All.Contains(trimmedCulture))
             throw new DomainException("DOMAIN_TRANSLATION_INVALID_CULTURE", "Unsupported culture.");
+        
         if (trimmedKey.Length > KeyMaxLength)
-            throw new DomainException("DOMAIN_TRANSLATION_INVALID_KEY", $"Key cannot exceed {KeyMaxLength} characters.");
+            throw new DomainException(
+                "DOMAIN_TRANSLATION_INVALID_KEY", 
+                $"Key cannot exceed {KeyMaxLength} characters.");
         
         if (string.IsNullOrWhiteSpace(createdBy))
             throw new DomainException("DOMAIN_TRANSLATION_INVALID_CREATED_BY", "CreatedBy is required.");
@@ -73,7 +83,7 @@ internal sealed class Translation : IAuditableEntity
             trimmedKey,
             trimmedValue,
             createdBy,
-            string.IsNullOrWhiteSpace(description) ? null : description.Trim(),
+            trimmedDescription,
             isSystemDefined);
     }
     
@@ -86,6 +96,11 @@ internal sealed class Translation : IAuditableEntity
 
         var trimmedValue = value.Trim();
         var trimmedDescription = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+        
+        if (trimmedDescription?.Length > DescriptionMaxLength)
+            throw new DomainException(
+                "DOMAIN_TRANSLATION_INVALID_DESCRIPTION",
+                $"Description cannot exceed {DescriptionMaxLength} characters.");
 
         if (trimmedValue == Value && trimmedDescription == Description) return;
 

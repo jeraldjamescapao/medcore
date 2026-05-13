@@ -1,4 +1,4 @@
-namespace MedCore.Modules.Localization.Infrastructure.Persistence;
+namespace MedCore.Modules.Localization.Infrastructure.Persistence.Logging;
 
 using Microsoft.Extensions.Logging;
 

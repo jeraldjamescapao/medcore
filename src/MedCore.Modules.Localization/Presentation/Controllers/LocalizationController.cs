@@ -5,6 +5,7 @@ using MedCore.Common.Authorization;
 using MedCore.Common.Controllers;
 using MedCore.Modules.Localization.Application.Abstractions;
 using MedCore.Modules.Localization.Application.Contracts;
+using MedCore.Modules.Localization.Application.Contracts.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

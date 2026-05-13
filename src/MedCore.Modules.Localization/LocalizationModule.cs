@@ -3,7 +3,7 @@ namespace MedCore.Modules.Localization;
 using MedCore.Common.Localization;
 using MedCore.Common.Modules;
 using MedCore.Modules.Localization.Configuration;
-using MedCore.Modules.Localization.Infrastructure.Persistence;
+using MedCore.Modules.Localization.Infrastructure.Persistence.Seeds;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -3,7 +3,7 @@ namespace MedCore.Modules.Localization.Tests.Application.Services.TranslationSer
 using FluentAssertions;
 using MedCore.Common.Localization;
 using MedCore.Common.Results;
-using MedCore.Modules.Localization.Application.Contracts;
+using MedCore.Modules.Localization.Application.Contracts.Requests;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Xunit;

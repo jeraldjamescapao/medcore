@@ -1,4 +1,4 @@
-namespace MedCore.Modules.Localization.Application.Contracts;
+namespace MedCore.Modules.Localization.Application.Contracts.Responses;
 
 public sealed record TranslationResponse(
     long Id,

@@ -4,7 +4,9 @@ using MedCore.Common.Localization;
 using MedCore.Common.Results;
 using MedCore.Common.Services;
 using MedCore.Modules.Localization.Application.Abstractions;
-using MedCore.Modules.Localization.Application.Contracts;
+using MedCore.Modules.Localization.Application.Contracts.Requests;
+using MedCore.Modules.Localization.Application.Contracts.Responses;
+using MedCore.Modules.Localization.Application.Errors;
 using MedCore.Modules.Localization.Application.Logging;
 using Microsoft.Extensions.Logging;
 

@@ -38,7 +38,7 @@ internal sealed class LocalizationDbContext : DbContext
                 .HasColumnType("nvarchar(max)");
 
             entity.Property(x => x.Description)
-                .HasMaxLength(500);
+                .HasMaxLength(Translation.DescriptionMaxLength);
 
             entity.Property(x => x.IsActive)
                 .IsRequired()

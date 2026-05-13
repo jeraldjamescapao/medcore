@@ -1,7 +1,8 @@
 namespace MedCore.Modules.Localization.Application.Abstractions;
 
 using MedCore.Common.Results;
-using MedCore.Modules.Localization.Application.Contracts;
+using MedCore.Modules.Localization.Application.Contracts.Requests;
+using MedCore.Modules.Localization.Application.Contracts.Responses;
 
 public interface ITranslationService
 {
