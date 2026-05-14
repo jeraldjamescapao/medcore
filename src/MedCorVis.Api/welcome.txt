@@ -1,0 +1,12 @@
++--------------------------------------------------+
+|                                                  |
+|   MedCorVis API                                  |
+|   by Jerald James Capao                          |
+|                                                  |
+|   Healthcare API for patients, doctors,          |
+|   and appointments.                              |
+|                                                  |
+|   API Docs  ->  /scalar/v1                       |
+|   Logs      ->  http://localhost:5341            |
+|                                                  |
++--------------------------------------------------+

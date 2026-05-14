@@ -2,36 +2,36 @@
 
 ## Overview
 
-MedCore is a modular monolith. Each module has its own Domain, Application,
+MedCorVis is a modular monolith. Each module has its own Domain, Application,
 Infrastructure, and Presentation layers. Module boundaries are designed so that
 each module can be extracted independently without restructuring
 its internal layers.
 
-The API host (`MedCore.Api`) is responsible for startup wiring only.
+The API host (`MedCorVis.Api`) is responsible for startup wiring only.
 It does not own any business logic or domain models.
 
 ## Project Structure
 
 ```
 src/
-  MedCore.Api                   # Host - middleware, startup, wiring only
-  MedCore.Common                # Shared contracts, interfaces, and result types
-  MedCore.Infrastructure        # Shared infrastructure (email via MailKit)
-  MedCore.Modules.Identity      # Auth, JWT, refresh tokens, email confirmation
-  MedCore.Modules.Users         # User profile, culture preference, phone
-  MedCore.Modules.Localization  # DB-backed translations, in-memory cache
-  MedCore.Modules.CodeItems     # Healthcare reference data, multilingual labels
+  MedCorVis.Api                   # Host - middleware, startup, wiring only
+  MedCorVis.Common                # Shared contracts, interfaces, and result types
+  MedCorVis.Infrastructure        # Shared infrastructure (email via MailKit)
+  MedCorVis.Modules.Identity      # Auth, JWT, refresh tokens, email confirmation
+  MedCorVis.Modules.Users         # User profile, culture preference, phone
+  MedCorVis.Modules.Localization  # DB-backed translations, in-memory cache
+  MedCorVis.Modules.CodeItems     # Healthcare reference data, multilingual labels
 
 tests/
-  MedCore.Modules.Identity.Tests
-  MedCore.Modules.Users.Tests
-  MedCore.Modules.Localization.Tests
-  MedCore.Modules.CodeItems.Tests
+  MedCorVis.Modules.Identity.Tests
+  MedCorVis.Modules.Users.Tests
+  MedCorVis.Modules.Localization.Tests
+  MedCorVis.Modules.CodeItems.Tests
 ```
 
 ## Module System
 
-Each module implements `IModule` from `MedCore.Common`:
+Each module implements `IModule` from `MedCorVis.Common`:
 
 ```csharp
 public interface IModule
@@ -135,7 +135,7 @@ Error code format: `MODULE_RESOURCE_DESCRIPTION` (e.g. `CODEITEMS_ITEM_NOT_FOUND
 Modules do not reference each other's assemblies. Cross-module references use `Guid`
 only — no EF navigation properties across module boundaries.
 
-`ICurrentUserService` (in `MedCore.Common`) is injected wherever business logic needs
+`ICurrentUserService` (in `MedCorVis.Common`) is injected wherever business logic needs
 the caller's identity. User ID is always resolved from the validated JWT token.
 It is never accepted from a request body or URL parameter (IDOR prevention).
 Nested routes enforce parent ownership at the service layer — a child resource is

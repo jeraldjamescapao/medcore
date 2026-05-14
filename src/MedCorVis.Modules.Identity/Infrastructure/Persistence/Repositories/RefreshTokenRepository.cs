@@ -1,0 +1,53 @@
+using MedCorVis.Modules.Identity.Domain.Tokens;
+
+namespace MedCorVis.Modules.Identity.Infrastructure.Persistence.Repositories;
+
+using Microsoft.EntityFrameworkCore;
+using Identity.Domain.Tokens;
+
+internal sealed class RefreshTokenRepository : IRefreshTokenRepository
+{
+    private readonly IdentityDbContext _context;
+
+    public RefreshTokenRepository(IdentityDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<RefreshToken?> GetByTokenAsync(string token, CancellationToken ct = default)
+    {
+        return await _context.RefreshTokens
+            .FirstOrDefaultAsync(t => t.Token == token, ct);
+    }
+    
+    public async Task AddAsync(RefreshToken token, CancellationToken ct = default)
+    {
+        await _context.RefreshTokens.AddAsync(token, ct);
+    }
+    
+    public Task UpdateAsync(RefreshToken token, CancellationToken ct = default)
+    {
+        _context.RefreshTokens.Update(token);
+        return Task.CompletedTask;
+    }
+
+    public async Task RevokeAllForUserAsync(Guid userId, CancellationToken ct = default)
+    {
+        await _context.RefreshTokens
+            .Where(t => t.UserId == userId)
+            .ExecuteUpdateAsync(u => 
+                u.SetProperty(t => t.IsRevoked, true), cancellationToken: ct);
+    }
+
+    public async Task<int> DeleteExpiredAsync(CancellationToken ct = default)
+    {
+        return await _context.RefreshTokens
+            .Where(t => t.ExpiresAtUtc < DateTimeOffset.UtcNow)
+            .ExecuteDeleteAsync(ct);
+    }
+
+    public async Task SaveChangesAsync(CancellationToken ct = default)
+    {
+        await _context.SaveChangesAsync(ct);
+    }
+}

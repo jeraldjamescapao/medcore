@@ -1,13 +1,13 @@
-# MedCore
+# MedCorVis
 
-MedCore is a healthcare API for managing patients, doctors, and appointments.
+MedCorVis is a healthcare API for managing patients, doctors, and appointments.
 Built as a backend engineering portfolio project showcasing .NET 10 modular monolith architecture
 with clean layer separation, JWT authentication, refresh token rotation,
 and structured logging. Built with ASP.NET Core, EF Core, and SQL Server.
 
 ## The Story
 
-I built MedCore to demonstrate how I design and structure backend systems.
+I built MedCorVis to demonstrate how I design and structure backend systems.
 The domain is healthcare: patients, doctors, and appointments.
 I wanted a codebase where every decision has a reason I can defend, not just code that runs.
 
@@ -91,7 +91,7 @@ with a sample development configuration for reviewer convenience.
 Copy the example file:
 
 ```bash
-cp src/MedCore.Api/appsettings.Example.json src/MedCore.Api/appsettings.Development.json
+cp src/MedCorVis.Api/appsettings.Example.json src/MedCorVis.Api/appsettings.Development.json
 ```
 
 ### Run the services
@@ -110,19 +110,19 @@ From the solution root:
 Apply Identity migrations:
 
 ```bash
-dotnet ef database update --project src/MedCore.Modules.Identity/MedCore.Modules.Identity.csproj --startup-project src/MedCore.Api/MedCore.Api.csproj --context IdentityDbContext
+dotnet ef database update --project src/MedCorVis.Modules.Identity/MedCorVis.Modules.Identity.csproj --startup-project src/MedCorVis.Api/MedCorVis.Api.csproj --context IdentityDbContext
 ```
 
 Apply Localization migrations:
 
 ```bash
-dotnet ef database update --project src/MedCore.Modules.Localization/MedCore.Modules.Localization.csproj --startup-project src/MedCore.Api/MedCore.Api.csproj --context LocalizationDbContext
+dotnet ef database update --project src/MedCorVis.Modules.Localization/MedCorVis.Modules.Localization.csproj --startup-project src/MedCorVis.Api/MedCorVis.Api.csproj --context LocalizationDbContext
 ```
 
 Apply CodeItems migrations:
 
 ```bash
-dotnet ef database update --project src/MedCore.Modules.CodeItems/MedCore.Modules.CodeItems.csproj --startup-project src/MedCore.Api/MedCore.Api.csproj --context CodeItemsDbContext
+dotnet ef database update --project src/MedCorVis.Modules.CodeItems/MedCorVis.Modules.CodeItems.csproj --startup-project src/MedCorVis.Api/MedCorVis.Api.csproj --context CodeItemsDbContext
 ```
 
 ### Run the API
@@ -130,7 +130,7 @@ dotnet ef database update --project src/MedCore.Modules.CodeItems/MedCore.Module
 From the solution root:
 
 ```bash
-dotnet run --project src/MedCore.Api/MedCore.Api.csproj --launch-profile https
+dotnet run --project src/MedCorVis.Api/MedCorVis.Api.csproj --launch-profile https
 ```
 
 The API will be available at `https://localhost:7212`.
@@ -156,9 +156,9 @@ With the API running, visit `https://localhost:7212/scalar/v1`.
 
 Visit `http://localhost:5341` to browse and query structured logs in real time.
 
-### Try the API with MedCore.http
+### Try the API with MedCorVis.http
 
-The repo includes `src/MedCore.Api/MedCore.http` with all endpoints
+The repo includes `src/MedCorVis.Api/MedCorVis.http` with all endpoints
 pre-configured and ready to run. It works in:
 
 - **JetBrains Rider**: built-in HTTP client, no setup needed
@@ -178,8 +178,8 @@ and override the `Email` section in `appsettings.Development.json`.
 
 A default admin account is seeded on first startup for reviewer convenience:
 
-- **Email**: admin@medcore.dev
-- **Password**: Admin_MedCore_2026!
+- **Email**: admin@MedCorVis.dev
+- **Password**: Admin_MedCorVis_2026!
 
 Use this account to log in and test the admin endpoints.
 
