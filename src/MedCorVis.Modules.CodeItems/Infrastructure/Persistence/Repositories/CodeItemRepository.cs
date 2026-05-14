@@ -142,19 +142,21 @@ internal sealed class CodeItemRepository : ICodeItemRepository
         return (category, items);
     }
     
-    public async Task<string?> GetLabelAsync(
-        string entityType, long entityId, string culture, CancellationToken ct = default)
+    public async Task<IReadOnlyDictionary<long, string>> GetItemLabelsByCategoryAsync(
+        long categoryId, string culture, CancellationToken ct = default)
     {
         return await _context.Translations
             .AsNoTracking()
             .Where(t =>
-                t.EntityType == entityType &&
-                t.EntityId   == entityId   &&
-                t.Culture    == culture    &&
-                t.IsActive   &&
-                !t.IsDeleted)
-            .Select(t => t.Label)
-            .FirstOrDefaultAsync(ct);
+                t.EntityType == CodeItemTranslation.EntityTypeItem &&
+                t.Culture    == culture                            &&
+                t.IsActive                                         &&
+                !t.IsDeleted                                       &&
+                _context.Items
+                    .Where(i => i.CategoryId == categoryId && i.IsActive && !i.IsDeleted)
+                    .Select(i => i.Id)
+                    .Contains(t.EntityId))
+            .ToDictionaryAsync(t => t.EntityId, t => t.Label, ct);
     }
     
     #endregion

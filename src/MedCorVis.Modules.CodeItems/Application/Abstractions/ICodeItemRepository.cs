@@ -24,12 +24,12 @@ internal interface ICodeItemRepository
     Task<CodeItemTranslation?> GetTranslationAsync(
         string entityType, long entityId, string culture, CancellationToken ct = default);
     Task AddTranslationAsync(CodeItemTranslation translation, CancellationToken ct = default);
-
+    
     // Consumer
     Task<(Category? Category, IReadOnlyList<CodeItem> Items)> GetActiveByCategoryCodeAsync(
         string categoryCode, CancellationToken ct = default);
-    Task<string?> GetLabelAsync(
-        string entityType, long entityId, string culture, CancellationToken ct = default);
+    Task<IReadOnlyDictionary<long, string>> GetItemLabelsByCategoryAsync(
+        long categoryId, string culture, CancellationToken ct = default);
     
     // Persistence
     Task SaveChangesAsync(CancellationToken ct = default);

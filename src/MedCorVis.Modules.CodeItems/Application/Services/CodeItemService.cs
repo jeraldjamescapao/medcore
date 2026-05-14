@@ -407,7 +407,7 @@ internal sealed class CodeItemService : ICodeItemService
     public async Task<Result<CodeItemListResponse>> GetActiveItemsAsync(
         string categoryCode, CancellationToken ct = default)
     {
-        var (category, items) = 
+        var (category, items) =
             await _repository.GetActiveByCategoryCodeAsync(categoryCode, ct);
 
         if (category is null)
@@ -416,25 +416,31 @@ internal sealed class CodeItemService : ICodeItemService
             return Result<CodeItemListResponse>.NotFound(CodeItemErrors.CategoryNotFound);
         }
 
+        if (items.Count == 0)
+            return Result<CodeItemListResponse>.Success(
+                new CodeItemListResponse(categoryCode, []));
+
         var culture = _currentCultureService.Culture;
 
-        var entries = new List<CodeItemEntry>();
+        var labels = await _repository.GetItemLabelsByCategoryAsync(category.Id, culture, ct);
 
-        foreach (var item in items)
+        IReadOnlyDictionary<long, string>? englishLabels = null;
+        if (culture != SupportedCultures.English)
+            englishLabels = await _repository.GetItemLabelsByCategoryAsync(
+                category.Id, SupportedCultures.English, ct);
+
+        var entries = items.Select(item =>
         {
-            var label = await _repository.GetLabelAsync(
-                CodeItemTranslation.EntityTypeItem, item.Id, culture, ct);
+            labels.TryGetValue(item.Id, out var label);
 
-            // Fallback chain: requested culture → English → Code
-            if (label is null && culture != SupportedCultures.English)
-                label = await _repository.GetLabelAsync(
-                    CodeItemTranslation.EntityTypeItem, item.Id, SupportedCultures.English, ct);
+            if (label is null)
+                englishLabels?.TryGetValue(item.Id, out label);
 
-            entries.Add(new CodeItemEntry(item.Code, label ?? item.Code));
-        }
+            return new CodeItemEntry(item.Code, label ?? item.Code);
+        }).ToList();
 
         return Result<CodeItemListResponse>.Success(
-            new CodeItemListResponse(category.Code, entries));
+            new CodeItemListResponse(categoryCode, entries));
     }
     
     #endregion
