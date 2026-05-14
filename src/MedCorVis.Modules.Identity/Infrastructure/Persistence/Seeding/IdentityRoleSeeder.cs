@@ -19,9 +19,13 @@ internal static class IdentityRoleSeeder
 
         var roles = new Dictionary<string, string>
         {
-            [AppRoles.Admin] = "System Administrator",
-            [AppRoles.Doctor] = "Doctor User",
-            [AppRoles.Patient] = "Patient User"
+            [AppRoles.Admin]            = "System Administrator",
+            [AppRoles.Doctor]           = "Doctor User",
+            [AppRoles.MedicalSecretary] = "Medical Secretary User",
+            [AppRoles.MedTech]          = "Medical Technologist User",
+            [AppRoles.Nurse]            = "Nurse User",
+            [AppRoles.Patient]          = "Patient User",
+            [AppRoles.Receptionist]     = "Receptionist User"
         };
         
         RoleSeederLogMessages.RoleSeedingStarted(logger, string.Join(", ", roles.Keys), null);
