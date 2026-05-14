@@ -18,7 +18,7 @@ public sealed class CodeItemsConsumerController : BaseApiController
         _service = service;
     }
 
-    [HttpGet("{categoryCode}")]
+    [HttpGet("lookup/{categoryCode}")]
     public async Task<IActionResult> GetActiveItemsAsync(string categoryCode, CancellationToken ct)
     {
         var result = await _service.GetActiveItemsAsync(categoryCode, ct);

@@ -582,7 +582,7 @@ Authorization: Bearer {{AccessToken}}
 # Returns: 200 with category code and list of { code, label }.
 # ─────────────────────────────────────────
 
-GET {{MedCorVis_HostAddress}}/api/v1/code-items/appointment.type
+GET {{MedCorVis_HostAddress}}/api/v1/code-items/lookup/appointment.type
 Authorization: Bearer {{AccessToken}}
 
 ###
