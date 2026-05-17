@@ -1,9 +1,17 @@
 namespace MedCorVis.Modules.Identity.Domain.Tokens;
 
-using MedCorVis.Common.Exceptions;
+using MedCorVis.Common.Domain;
 
 internal sealed class RefreshToken
 {
+    #region Constants
+    
+    public const int TokenMaxLength = 500;
+    
+    #endregion
+    
+    #region Properties
+    
     public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
     public Guid FamilyId { get; private set; }
@@ -15,6 +23,10 @@ internal sealed class RefreshToken
     
     public bool IsExpired => DateTimeOffset.UtcNow >= ExpiresAtUtc;
     public bool IsActive => !IsRevoked && !IsExpired;
+    
+    #endregion
+    
+    #region Constructors
     
     private RefreshToken() { }
 
@@ -32,6 +44,10 @@ internal sealed class RefreshToken
         CreatedAtUtc = DateTimeOffset.UtcNow;
         IsRevoked = false;
     }
+    
+    #endregion
+    
+    #region Factory
 
     public static RefreshToken Create(
         Guid userId, 
@@ -39,17 +55,21 @@ internal sealed class RefreshToken
         string token, 
         DateTimeOffset expiresAtUtc)
     {
-        if (userId == Guid.Empty)
-            throw new DomainException("DOMAIN_TOKEN_INVALID_USER_ID", "UserId cannot be empty.");
-        if (familyId == Guid.Empty)
-            throw new DomainException("DOMAIN_TOKEN_INVALID_FAMILY_ID", "FamilyId cannot be empty.");
-        if (string.IsNullOrEmpty(token))
-            throw new DomainException("DOMAIN_TOKEN_INVALID_TOKEN", "Token cannot be null or empty.");
-        if (expiresAtUtc <= DateTimeOffset.UtcNow)
-            throw new DomainException("DOMAIN_TOKEN_INVALID_EXPIRY", "ExpiresAtUtc must be in the future.");
+        DomainGuards.RequireNonEmptyGuid(
+            userId, "DOMAIN_TOKEN_INVALID_USER_ID", "UserId cannot be empty.");
+        DomainGuards.RequireNonEmptyGuid(
+            familyId, "DOMAIN_TOKEN_INVALID_FAMILY_ID", "FamilyId cannot be empty.");
+        DomainGuards.RequireNonEmpty(
+            token, "DOMAIN_TOKEN_INVALID_TOKEN", "Token cannot be empty.");
+        DomainGuards.RequireFutureDate(
+            expiresAtUtc, "DOMAIN_TOKEN_INVALID_EXPIRY", "ExpiresAtUtc must be in the future.");
         
         return new RefreshToken(userId, familyId, token, expiresAtUtc);
     }
+    
+    #endregion
+    
+    #region Methods
     
     public void Revoke()
     {
@@ -59,9 +79,11 @@ internal sealed class RefreshToken
     
     public void MarkReplacedBy(Guid newTokenId)
     {
-        if (newTokenId == Guid.Empty)
-            throw new DomainException("DOMAIN_TOKEN_INVALID_REPLACEMENT_ID", "New token ID cannot be empty.");
+        DomainGuards.RequireNonEmptyGuid(
+            newTokenId, "DOMAIN_TOKEN_INVALID_REPLACEMENT_ID", "New token ID cannot be empty.");
         
         ReplacedByTokenId = newTokenId;
     }
+    
+    #endregion
 }

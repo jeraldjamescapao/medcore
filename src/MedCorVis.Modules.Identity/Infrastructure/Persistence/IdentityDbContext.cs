@@ -3,6 +3,7 @@ namespace MedCorVis.Modules.Identity.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using MedCorVis.Common.Auditing;
 using MedCorVis.Modules.Identity.Domain.Roles;
 using MedCorVis.Modules.Identity.Domain.Tokens;
 using MedCorVis.Modules.Identity.Domain.Users;
@@ -29,18 +30,18 @@ internal sealed class IdentityDbContext
 
             entity.Property(x => x.FirstName)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(ApplicationUser.FirstNameMaxLength);
 
             entity.Property(x => x.LastName)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(ApplicationUser.LastNameMaxLength);
             
             entity.Property(x => x.BirthDate)
                 .HasColumnType("date")
                 .IsRequired();
             
             entity.Property(x => x.PreferredCulture)
-                .HasMaxLength(10)
+                .HasMaxLength(ApplicationUser.PreferredCultureMaxLength)
                 .IsRequired(false);
 
             entity.Property(x => x.IsActive)
@@ -56,10 +57,10 @@ internal sealed class IdentityDbContext
             
             entity.Property(x => x.CreatedBy)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(IAuditableEntity.CreatedByMaxLength);
 
             entity.Property(x => x.ModifiedBy)
-                .HasMaxLength(100);
+                .HasMaxLength(IAuditableEntity.ModifiedByMaxLength);
 
             entity.HasIndex(x => x.IsActive)
                 .HasDatabaseName("IX_Users_Is_Active");
@@ -71,7 +72,7 @@ internal sealed class IdentityDbContext
             
             entity.Property(x => x.Description)
                 .IsRequired()
-                .HasMaxLength(250);
+                .HasMaxLength(ApplicationRole.MaxDescriptionLength);
         });
 
         builder.Entity<IdentityUserRole<Guid>>(entity =>
@@ -107,7 +108,7 @@ internal sealed class IdentityDbContext
 
             entity.Property(x => x.Token)
                 .IsRequired()
-                .HasMaxLength(500);
+                .HasMaxLength(RefreshToken.TokenMaxLength);
 
             entity.Property(x => x.ExpiresAtUtc)
                 .HasColumnType("datetimeoffset")

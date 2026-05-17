@@ -1,13 +1,22 @@
 namespace MedCorVis.Modules.Identity.Domain.Users;
 
-using MedCorVis.Common.Exceptions;
-using MedCorVis.Common.Localization;
+using MedCorVis.Common.Domain;
 using Microsoft.AspNetCore.Identity;
 using MedCorVis.Common.Auditing;
 
 public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity
 {
+    #region Constants
+    
     public const string SelfRegisteredActor = "Self";
+    public const int FirstNameMaxLength = 100;
+    public const int LastNameMaxLength = 100;
+    public const int EmailMaxLength = 256;
+    public const int PreferredCultureMaxLength = 10;    
+    
+    #endregion
+    
+    #region Properties
     
     public string FirstName { get; private set; } = null!;
     public string LastName { get; private set; } = null!;
@@ -22,10 +31,12 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity
 
     public string FullName => $"{FirstName} {LastName}";
     public string FullNameInverted => $"{LastName}, {FirstName}";
-    
-    public string FullNameWithInitials => 
-        FirstName.Length > 0 ? $"{FirstName[0]}. {LastName}" : FullName;
+    public string FullNameWithInitials => $"{FirstName[0]}. {LastName}";
 
+    #endregion
+    
+    #region Constructors
+    
     private ApplicationUser() { }
 
     private ApplicationUser(
@@ -48,6 +59,10 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity
         CreatedBy = createdBy;
         IsActive = true;
     }
+    
+    #endregion   
+    
+    #region Factory
 
     public static ApplicationUser Create(
         string email,
@@ -57,28 +72,33 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity
         string createdBy,
         string? preferredCulture = null)
     {
-        if (string.IsNullOrWhiteSpace(email))
-            throw new DomainException("DOMAIN_USER_INVALID_EMAIL", "Email is required.");
-        if (string.IsNullOrWhiteSpace(firstName))
-            throw new DomainException("DOMAIN_USER_INVALID_FIRST_NAME", "FirstName is required.");
-        if (string.IsNullOrWhiteSpace(lastName))
-            throw new DomainException("DOMAIN_USER_INVALID_LAST_NAME", "LastName is required.");
-        if (birthDate > DateOnly.FromDateTime(DateTime.UtcNow))
-            throw new DomainException("DOMAIN_USER_INVALID_BIRTH_DATE", "BirthDate cannot be in the future.");
-        if (preferredCulture is not null &&
-            !SupportedCultures.All.Contains(preferredCulture))
-            throw new DomainException("DOMAIN_USER_INVALID_CULTURE", "Unsupported culture.");
-        if (string.IsNullOrWhiteSpace(createdBy))
-            throw new DomainException("DOMAIN_USER_INVALID_CREATED_BY", "CreatedBy is required.");
+        var trimmedEmail = DomainGuards.RequireNonEmpty(
+            email, "DOMAIN_USER_INVALID_EMAIL", "Email is required.");
+        var trimmedFirstName = DomainGuards.RequireNonEmpty(
+            firstName, "DOMAIN_USER_INVALID_FIRST_NAME", "FirstName is required.");
+        var trimmedLastName = DomainGuards.RequireNonEmpty(
+            lastName, "DOMAIN_USER_INVALID_LAST_NAME", "LastName is required.");
+        var trimmedCulture = DomainGuards.RequireValidCulture(
+            preferredCulture, "DOMAIN_USER_INVALID_CULTURE", "Unsupported culture.");
+        var trimmedCreatedBy = DomainGuards.RequireNonEmpty(
+            createdBy, "DOMAIN_USER_INVALID_CREATED_BY", "CreatedBy is required.", 
+            IAuditableEntity.CreatedByMaxLength);
+        
+        DomainGuards.RequirePastOrPresentDate(birthDate, 
+            "DOMAIN_USER_INVALID_BIRTH_DATE", "BirthDate cannot be in the future.");
         
         return new ApplicationUser(
-            email.Trim(), 
-            firstName.Trim(), 
-            lastName.Trim(), 
+            trimmedEmail, 
+            trimmedFirstName, 
+            trimmedLastName, 
             birthDate,
-            createdBy,
-            preferredCulture);
+            trimmedCreatedBy,
+            trimmedCulture);
     }
+    
+    #endregion
+    
+    #region Methods
 
     public void UpdateProfile(
         string firstName, 
@@ -86,17 +106,16 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity
         DateOnly birthDate, 
         string modifiedBy)
     {
-        if (string.IsNullOrWhiteSpace(firstName))
-            throw new DomainException("DOMAIN_USER_INVALID_FIRST_NAME", "FirstName is required.");
-        if (string.IsNullOrWhiteSpace(lastName))
-            throw new DomainException("DOMAIN_USER_INVALID_LAST_NAME", "LastName is required.");
-        if (birthDate > DateOnly.FromDateTime(DateTime.UtcNow))
-            throw new DomainException("DOMAIN_USER_INVALID_BIRTH_DATE", "BirthDate cannot be in the future.");
-        if (string.IsNullOrWhiteSpace(modifiedBy))
-            throw new DomainException("DOMAIN_USER_INVALID_MODIFIED_BY", "ModifiedBy is required.");
+        var trimmedFirstName = DomainGuards.RequireNonEmpty(
+            firstName, "DOMAIN_USER_INVALID_FIRST_NAME", "FirstName is required.");
+        var trimmedLastName = DomainGuards.RequireNonEmpty(
+            lastName, "DOMAIN_USER_INVALID_LAST_NAME", "LastName is required.");
+        var trimmedModifiedBy = DomainGuards.RequireNonEmpty(
+            modifiedBy, "DOMAIN_USER_INVALID_MODIFIED_BY", "ModifiedBy is required.",
+            IAuditableEntity.ModifiedByMaxLength);
         
-        var trimmedFirstName = firstName.Trim();
-        var trimmedLastName = lastName.Trim();
+        DomainGuards.RequirePastOrPresentDate(birthDate, 
+            "DOMAIN_USER_INVALID_BIRTH_DATE", "BirthDate cannot be in the future.");
         
         var nameChanged = trimmedFirstName != FirstName || trimmedLastName != LastName;
         var birthDateChanged = birthDate != BirthDate;
@@ -113,49 +132,49 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity
             BirthDate = birthDate;
         
         ModifiedAtUtc = DateTimeOffset.UtcNow;
-        ModifiedBy = modifiedBy;
+        ModifiedBy = trimmedModifiedBy;
     }
     
     public void UpdatePreferredCulture(string culture, string modifiedBy)
     {
-        if (string.IsNullOrWhiteSpace(culture))
-            throw new DomainException("DOMAIN_USER_INVALID_CULTURE", "Culture is required.");
-        
-        var trimmedCulture = culture.Trim();
-        
-        if (!SupportedCultures.All.Contains(trimmedCulture))
-            throw new DomainException("DOMAIN_USER_INVALID_CULTURE", "Unsupported culture.");
-        if (string.IsNullOrWhiteSpace(modifiedBy))
-            throw new DomainException("DOMAIN_USER_INVALID_MODIFIED_BY", "ModifiedBy is required."); 
+        var trimmedCulture = DomainGuards.RequireValidCulture(
+            culture, "DOMAIN_USER_INVALID_CULTURE", "Culture is required or unsupported.");
+        var trimmedModifiedBy = DomainGuards.RequireNonEmpty(
+            modifiedBy, "DOMAIN_USER_INVALID_MODIFIED_BY", "ModifiedBy is required.",
+            IAuditableEntity.ModifiedByMaxLength);
         
         if (trimmedCulture == PreferredCulture) return;
-
+        
         PreferredCulture = trimmedCulture;
         ModifiedAtUtc = DateTimeOffset.UtcNow;
-        ModifiedBy = modifiedBy;
+        ModifiedBy = trimmedModifiedBy;
     }
     
     public void Deactivate(string modifiedBy)
     {
-        if (string.IsNullOrWhiteSpace(modifiedBy))
-            throw new DomainException("DOMAIN_USER_INVALID_MODIFIED_BY", "ModifiedBy is required."); 
+        var trimmedModifiedBy = DomainGuards.RequireNonEmpty(
+            modifiedBy, "DOMAIN_USER_INVALID_MODIFIED_BY", "ModifiedBy is required.",
+            IAuditableEntity.ModifiedByMaxLength);
         
         if (!IsActive) return;
         
         IsActive = false;
         ModifiedAtUtc = DateTimeOffset.UtcNow;
-        ModifiedBy = modifiedBy;
+        ModifiedBy = trimmedModifiedBy;
     }
     
     public void Activate(string modifiedBy)
     {
-        if (string.IsNullOrWhiteSpace(modifiedBy))
-            throw new DomainException("DOMAIN_USER_INVALID_MODIFIED_BY", "ModifiedBy is required."); 
+        var trimmedModifiedBy = DomainGuards.RequireNonEmpty(
+            modifiedBy, "DOMAIN_USER_INVALID_MODIFIED_BY", "ModifiedBy is required.",
+            IAuditableEntity.ModifiedByMaxLength);
         
         if (IsActive) return;
         
         IsActive = true;
         ModifiedAtUtc = DateTimeOffset.UtcNow; 
-        ModifiedBy = modifiedBy;
+        ModifiedBy = trimmedModifiedBy;
     }
+    
+    #endregion
 }
