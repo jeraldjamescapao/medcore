@@ -79,4 +79,37 @@ public sealed class ReorderItemsTests : CodeItemServiceTestBase
             .DidNotReceive()
             .SaveChangesAsync(Arg.Any<CancellationToken>());
     }
+    
+    [Fact]
+    public async Task ReorderItemsAsync_ItemFromAnotherCategory_ReturnsNotFound()
+    {
+        var category = CreateCategory();
+
+        Repository
+            .GetCategoryByIdAsync(1, Arg.Any<CancellationToken>())
+            .Returns(category);
+
+        // Only 1 item returned — the other ID belongs to a different category,
+        // so it is excluded by the repo query
+        Repository
+            .GetTrackedItemsByCategoryIdAndIdsAsync(
+                1,
+                Arg.Any<IReadOnlyCollection<long>>(),
+                Arg.Any<CancellationToken>())
+            .Returns([CreateItem(categoryId: 1)]);
+
+        var request = new ReorderRequest([
+            new ReorderEntry(1, 10),
+            new ReorderEntry(2, 20) // ID 2 belongs to a different category
+        ]);
+
+        var result = await Sut.ReorderItemsAsync(1, request);
+
+        result.IsFailure.Should().BeTrue();
+        result.ErrorType.Should().Be(ResultErrorType.NotFound);
+        result.Error!.Code.Should().Be("CODEITEMS_ITEM_NOT_FOUND");
+        await Repository
+            .DidNotReceive()
+            .SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
 }
