@@ -65,7 +65,7 @@ internal static class IdentityModuleServiceCollectionExtensions
             {
                 options.User.RequireUniqueEmail = true;
 
-                options.Password.RequiredLength = 8;
+                options.Password.RequiredLength = ApplicationUser.PasswordMinLength;
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
                 options.Password.RequireUppercase = true;
@@ -93,9 +93,9 @@ internal static class IdentityModuleServiceCollectionExtensions
         services.Configure<DataProtectionTokenProviderOptions>(options =>
         {
             var tokenSettings = configuration.GetSection(IdentityTokenSettings.SectionName)
-                                    .Get<IdentityTokenSettings>()
-                                ?? throw new InvalidOperationException("IdentityTokens settings are not configured.");
-
+                .Get<IdentityTokenSettings>() 
+                    ?? throw new InvalidOperationException("IdentityTokens settings are not configured.");
+            
             options.TokenLifespan = TimeSpan.FromHours(tokenSettings.EmailConfirmationExpirationInHours);
         });
         

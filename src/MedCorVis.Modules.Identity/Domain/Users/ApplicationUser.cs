@@ -9,10 +9,14 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity
     #region Constants
     
     public const string SelfRegisteredActor = "Self";
+    public const int FirstNameMinLength = 2;
     public const int FirstNameMaxLength = 100;
+    public const int LastNameMinLength = 2;
     public const int LastNameMaxLength = 100;
     public const int EmailMaxLength = 256;
     public const int PreferredCultureMaxLength = 10;    
+    public const int PasswordMinLength = 8;
+    public const int PasswordMaxLength = 128;
     
     #endregion
     
