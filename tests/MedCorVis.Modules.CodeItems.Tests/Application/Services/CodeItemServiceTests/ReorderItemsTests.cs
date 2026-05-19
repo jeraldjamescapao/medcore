@@ -38,7 +38,7 @@ public sealed class ReorderItemsTests : CodeItemServiceTestBase
         var item = CreateItem();
         
         Repository
-            .GetTrackedItemsByCategoryIdAndIdsAsync(
+            .GetTrackedItemsByCategoryIdAndItemIdsAsync(
                 1,
                 Arg.Is<IReadOnlyCollection<long>>(ids => ids.Contains(item.Id)),
                 Arg.Any<CancellationToken>())
@@ -62,7 +62,7 @@ public sealed class ReorderItemsTests : CodeItemServiceTestBase
             .Returns(CreateCategory());
 
         Repository
-            .GetTrackedItemsByCategoryIdAndIdsAsync(
+            .GetTrackedItemsByCategoryIdAndItemIdsAsync(
                 1,
                 Arg.Is<IReadOnlyCollection<long>>(ids => ids.Contains(69)),
                 Arg.Any<CancellationToken>())
@@ -92,7 +92,7 @@ public sealed class ReorderItemsTests : CodeItemServiceTestBase
         // Only 1 item returned — the other ID belongs to a different category,
         // so it is excluded by the repo query
         Repository
-            .GetTrackedItemsByCategoryIdAndIdsAsync(
+            .GetTrackedItemsByCategoryIdAndItemIdsAsync(
                 1,
                 Arg.Any<IReadOnlyCollection<long>>(),
                 Arg.Any<CancellationToken>())

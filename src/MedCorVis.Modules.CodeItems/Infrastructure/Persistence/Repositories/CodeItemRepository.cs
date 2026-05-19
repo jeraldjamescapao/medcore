@@ -19,7 +19,6 @@ internal sealed class CodeItemRepository : ICodeItemRepository
     {
         return await _context.Categories
             .AsNoTracking()
-            .Where(c => !c.IsDeleted)
             .OrderBy(c => c.SortOrder)
             .ToListAsync(ct);
     }
@@ -27,29 +26,20 @@ internal sealed class CodeItemRepository : ICodeItemRepository
     public async Task<Category?> GetCategoryByIdAsync(long id, CancellationToken ct = default)
     {
         return await _context.Categories
-            .FirstOrDefaultAsync(c => 
-                c.Id == id && 
-                !c.IsDeleted, 
-                ct);
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
     }
     
     public async Task<Category?> GetCategoryByCodeAsync(string code, CancellationToken ct = default)
     {
         return await _context.Categories
-            .FirstOrDefaultAsync(c => 
-                c.Code == code && 
-                !c.IsDeleted, 
-                ct);
+            .FirstOrDefaultAsync(c => c.Code == code, ct);
     }
     
     public async Task<bool> CategoryCodeExistsAsync(string code, CancellationToken ct = default)
     {
         return await _context.Categories
             .AsNoTracking()
-            .AnyAsync(c => 
-                c.Code == code && 
-                !c.IsDeleted, 
-                ct);
+            .AnyAsync(c => c.Code == code, ct);
     }
     
     public async Task AddCategoryAsync(Category category, CancellationToken ct = default)
@@ -65,21 +55,18 @@ internal sealed class CodeItemRepository : ICodeItemRepository
         long categoryId, CancellationToken ct = default)
     {
         return await _context.Items
-            .Where(i => 
-                i.CategoryId == categoryId && 
-                !i.IsDeleted)
+            .Where(i => i.CategoryId == categoryId)
             .OrderBy(i => i.SortOrder)
             .ToListAsync(ct);       
     }
     
-    public async Task<IReadOnlyList<CodeItem>> GetTrackedItemsByCategoryIdAndIdsAsync(
+    public async Task<IReadOnlyList<CodeItem>> GetTrackedItemsByCategoryIdAndItemIdsAsync(
         long categoryId, IReadOnlyCollection<long> ids, CancellationToken ct = default)
     {
         return await _context.Items
-            .Where(i =>
-                i.CategoryId == categoryId &&
-                ids.Contains(i.Id) &&
-                !i.IsDeleted)
+            .Where(i => 
+                i.CategoryId == categoryId && 
+                ids.Contains(i.Id))
             .ToListAsync(ct);
     }
     
@@ -88,9 +75,7 @@ internal sealed class CodeItemRepository : ICodeItemRepository
     {
         return await _context.Items
             .AsNoTracking()
-            .Where(i => 
-                i.CategoryId == categoryId && 
-                !i.IsDeleted)
+            .Where(i => i.CategoryId == categoryId)
             .OrderBy(i => i.SortOrder)
             .ToListAsync(ct);
     }
@@ -98,10 +83,7 @@ internal sealed class CodeItemRepository : ICodeItemRepository
     public async Task<CodeItem?> GetItemByIdAsync(long id, CancellationToken ct = default)
     {
         return await _context.Items
-            .FirstOrDefaultAsync(i => 
-                i.Id == id && 
-                !i.IsDeleted, 
-                ct);
+            .FirstOrDefaultAsync(i => i.Id == id, ct);
     }
     
     public async Task<bool> ItemCodeExistsAsync(
@@ -111,8 +93,7 @@ internal sealed class CodeItemRepository : ICodeItemRepository
             .AsNoTracking()
             .AnyAsync(i => 
                 i.CategoryId == categoryId && 
-                i.Code == code && 
-                !i.IsDeleted, 
+                i.Code == code, 
                 ct);
     }
     
@@ -123,8 +104,7 @@ internal sealed class CodeItemRepository : ICodeItemRepository
             .AsNoTracking()
             .AnyAsync(i => 
                 i.CategoryId == categoryId && 
-                i.IsActive && 
-                !i.IsDeleted, 
+                i.IsActive, 
                 ct);
     }
     
@@ -144,8 +124,7 @@ internal sealed class CodeItemRepository : ICodeItemRepository
             .AsNoTracking()
             .Where(t => 
                 t.EntityType == entityType && 
-                t.EntityId == entityId && 
-                !t.IsDeleted)
+                t.EntityId == entityId)
             .OrderBy(t => t.Culture)
             .ToListAsync(ct);
     }
@@ -156,8 +135,7 @@ internal sealed class CodeItemRepository : ICodeItemRepository
         return await _context.Translations
             .Where(t => 
                 t.EntityType == entityType && 
-                t.EntityId == entityId && 
-                !t.IsDeleted)
+                t.EntityId == entityId)
             .OrderBy(t => t.Culture)
             .ToListAsync(ct);
     }
@@ -168,8 +146,7 @@ internal sealed class CodeItemRepository : ICodeItemRepository
         return await _context.Translations
             .Where(t => 
                 t.EntityType == entityType && 
-                entityIds.Contains(t.EntityId) && 
-                !t.IsDeleted)
+                entityIds.Contains(t.EntityId))
             .OrderBy(t => t.Culture)
             .ToListAsync(ct);       
     }
@@ -181,8 +158,8 @@ internal sealed class CodeItemRepository : ICodeItemRepository
             .FirstOrDefaultAsync(t =>
                 t.EntityType == entityType &&
                 t.EntityId   == entityId   &&
-                t.Culture    == culture    &&
-                !t.IsDeleted, ct);
+                t.Culture    == culture, 
+                ct);
     }
     
     public async Task AddTranslationAsync(CodeItemTranslation translation, CancellationToken ct = default)
@@ -201,8 +178,7 @@ internal sealed class CodeItemRepository : ICodeItemRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(c => 
                 c.Code == categoryCode && 
-                c.IsActive && 
-                !c.IsDeleted, 
+                c.IsActive,
                 ct);
 
         if (category is null)
@@ -213,7 +189,6 @@ internal sealed class CodeItemRepository : ICodeItemRepository
             .Where(i =>
                 i.CategoryId == category.Id &&
                 i.IsActive   &&
-                !i.IsDeleted &&
                 (i.ValidFrom == null || i.ValidFrom <= today) &&
                 (i.ValidTo   == null || i.ValidTo   >= today))
             .OrderBy(i => i.SortOrder)
@@ -231,12 +206,10 @@ internal sealed class CodeItemRepository : ICodeItemRepository
                 t.EntityType == CodeItemTranslation.EntityTypeItem &&
                 t.Culture    == culture                            &&
                 t.IsActive                                         &&
-                !t.IsDeleted                                       &&
                 _context.Items
                     .Where(i =>
                         i.CategoryId == categoryId &&
                         i.IsActive   &&
-                        !i.IsDeleted &&
                         (i.ValidFrom == null || i.ValidFrom <= today) &&
                         (i.ValidTo   == null || i.ValidTo   >= today))
                     .Select(i => i.Id)

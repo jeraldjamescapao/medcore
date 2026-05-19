@@ -14,7 +14,7 @@ internal interface ICodeItemRepository
     // Items
     Task<IReadOnlyList<CodeItem>> GetTrackedItemsByCategoryIdAsync(
         long categoryId, CancellationToken ct = default);
-    Task<IReadOnlyList<CodeItem>> GetTrackedItemsByCategoryIdAndIdsAsync(
+    Task<IReadOnlyList<CodeItem>> GetTrackedItemsByCategoryIdAndItemIdsAsync(
         long categoryId, IReadOnlyCollection<long> ids, CancellationToken ct = default);
     Task<IReadOnlyList<CodeItem>> GetItemsByCategoryIdAsync(
         long categoryId, CancellationToken ct = default);

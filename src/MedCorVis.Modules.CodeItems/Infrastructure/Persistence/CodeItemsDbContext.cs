@@ -1,10 +1,11 @@
 namespace MedCorVis.Modules.CodeItems.Infrastructure.Persistence;
 
+using MedCorVis.Common.Persistence;
 using MedCorVis.Modules.CodeItems.Domain;
 using MedCorVis.Modules.CodeItems.Infrastructure.Persistence.Configuration;
 using Microsoft.EntityFrameworkCore;
 
-internal sealed class CodeItemsDbContext : DbContext
+internal sealed class CodeItemsDbContext : BaseDbContext
 {
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<CodeItem> Items => Set<CodeItem>();

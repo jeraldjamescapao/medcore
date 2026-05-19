@@ -355,7 +355,8 @@ internal sealed class CodeItemService : ICodeItemService
             .ToList();
 
         var items 
-            = await _repository.GetTrackedItemsByCategoryIdAndIdsAsync(categoryId, requestedIds, ct);
+            = await _repository.GetTrackedItemsByCategoryIdAndItemIdsAsync(
+                categoryId, requestedIds, ct);
 
         // Count mismatch means one or more IDs either don't exist
         // or don't belong to this category. Return 404 either way.

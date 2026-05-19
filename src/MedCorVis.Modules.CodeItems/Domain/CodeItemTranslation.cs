@@ -4,7 +4,7 @@ using MedCorVis.Common.Auditing;
 using MedCorVis.Common.Exceptions;
 using MedCorVis.Common.Localization;
 
-internal sealed class CodeItemTranslation : IAuditableEntity
+internal sealed class CodeItemTranslation : IAuditableEntity, IDeletableEntity
 {
     public const string EntityTypeCategory  = "Category";
     public const string EntityTypeItem      = "Item";
@@ -195,6 +195,7 @@ internal sealed class CodeItemTranslation : IAuditableEntity
         if (IsDeleted) return;
 
         IsDeleted    = true;
+        IsActive     = false;
         DeletedAtUtc = DateTimeOffset.UtcNow;
         DeletedBy    = deletedBy;
     }

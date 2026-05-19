@@ -3,7 +3,7 @@ namespace MedCorVis.Modules.CodeItems.Domain;
 using MedCorVis.Common.Auditing;
 using MedCorVis.Common.Exceptions;
 
-internal sealed class CodeItem : IAuditableEntity
+internal sealed class CodeItem : IAuditableEntity, IDeletableEntity
 {
     public const int CodeMaxLength        = 100;
     public const int DescriptionMaxLength = 500;
@@ -158,6 +158,7 @@ internal sealed class CodeItem : IAuditableEntity
         if (IsDeleted) return;
 
         IsDeleted    = true;
+        IsActive     = false;
         DeletedAtUtc = DateTimeOffset.UtcNow;
         DeletedBy    = deletedBy;
     }
