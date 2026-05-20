@@ -21,4 +21,16 @@ public static class UserErrors
 
     public static readonly ResultError PhoneUpdateFailed =
         new("USERS_PHONE_UPDATE_FAILED", "Failed to update phone number.");
+    
+    public static readonly ResultError DeletionRequestAlreadyPending =
+        new("USERS_DELETION_REQUEST_ALREADY_PENDING", "A deletion request is already pending.");
+
+    public static readonly ResultError NoDeletionRequestPending =
+        new("USERS_NO_DELETION_REQUEST_PENDING", "No deletion request is pending for this user.");
+
+    public static readonly ResultError UserAlreadyDeleted =
+        new("USERS_USER_ALREADY_DELETED", "This user has already been deleted.");
+
+    public static readonly ResultError DeletionFailed =
+        new("USERS_DELETION_FAILED", "Failed to complete user deletion.");
 }

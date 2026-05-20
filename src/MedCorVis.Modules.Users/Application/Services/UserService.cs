@@ -135,6 +135,8 @@ internal sealed class UserService : IUserService
             user.PreferredCulture,
             user.PhoneNumber,
             user.IsActive,
+            user.IsDeleted,
+            user.DeletionRequestedAtUtc,
             user.CreatedAtUtc,
             user.ModifiedAtUtc);
     }

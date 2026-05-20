@@ -1,5 +1,5 @@
 namespace MedCorVis.Modules.Users.Application.Contracts.Responses;
-
+    
 public sealed record UserResponse(
     Guid Id,
     string Email,
@@ -10,5 +10,7 @@ public sealed record UserResponse(
     string? Culture,
     string? PhoneNumber,
     bool IsActive,
+    bool IsDeleted,
+    DateTimeOffset? DeletionRequestedAtUtc,
     DateTimeOffset CreatedAtUtc,
     DateTimeOffset? ModifiedAtUtc);

@@ -91,4 +91,50 @@ internal static class UserLogMessages
             "Phone number updated successfully for user {UserId}.");
 
     #endregion
+    
+    #region Deletion
+
+    public static readonly Action<ILogger, Guid, Exception?> DeletionRequestAlreadyPending =
+        LoggerMessage.Define<Guid>(
+            LogLevel.Warning,
+            new EventId(3013, "DeletionRequestAlreadyPending"),
+            "Deletion request rejected for user {UserId}: a request is already pending.");
+
+    public static readonly Action<ILogger, Guid, Exception?> DeletionRequestSubmitted =
+        LoggerMessage.Define<Guid>(
+            LogLevel.Information,
+            new EventId(3014, "DeletionRequestSubmitted"),
+            "User {UserId} submitted a deletion request.");
+
+    public static readonly Action<ILogger, Guid, Exception?> NoDeletionRequestPending =
+        LoggerMessage.Define<Guid>(
+            LogLevel.Warning,
+            new EventId(3015, "NoDeletionRequestPending"),
+            "Deletion request cancellation failed for user {UserId}: no pending request found.");
+
+    public static readonly Action<ILogger, Guid, Exception?> DeletionRequestCancelled =
+        LoggerMessage.Define<Guid>(
+            LogLevel.Information,
+            new EventId(3016, "DeletionRequestCancelled"),
+            "User {UserId} cancelled their deletion request.");
+
+    public static readonly Action<ILogger, Guid, Exception?> UserAlreadyDeleted =
+        LoggerMessage.Define<Guid>(
+            LogLevel.Warning,
+            new EventId(3017, "UserAlreadyDeleted"),
+            "Deletion failed: user {UserId} is already deleted.");
+
+    public static readonly Action<ILogger, Guid, Exception?> UserDeletionFailed =
+        LoggerMessage.Define<Guid>(
+            LogLevel.Warning,
+            new EventId(3018, "UserDeletionFailed"),
+            "Deletion failed for user {UserId}: identity update returned errors.");
+
+    public static readonly Action<ILogger, Guid, Guid, Exception?> UserDeletedSuccessfully =
+        LoggerMessage.Define<Guid, Guid>(
+            LogLevel.Information,
+            new EventId(3019, "UserDeletedSuccessfully"),
+            "User {TargetUserId} deleted and anonymised by actor {ActorId}.");
+
+    #endregion
 }

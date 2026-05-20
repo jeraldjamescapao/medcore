@@ -9,6 +9,7 @@ internal static class UsersModuleServiceCollectionExtensions
     public static IServiceCollection AddUsersModule(this IServiceCollection services)
     {
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IUserDeletionService, UserDeletionService>();
         
         return services;
     }
