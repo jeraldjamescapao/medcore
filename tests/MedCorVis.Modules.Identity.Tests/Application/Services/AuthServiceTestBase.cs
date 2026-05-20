@@ -1,5 +1,6 @@
 namespace MedCorVis.Modules.Identity.Tests.Application.Services;
 
+using MedCorVis.Common.Authorization;
 using MedCorVis.Common.Caching;
 using MedCorVis.Common.Localization;
 using MedCorVis.Common.Services;
@@ -92,7 +93,7 @@ public abstract class AuthServiceTestBase
 
         if (!isActive)
         {
-            user.Deactivate(ApplicationUser.SelfRegisteredActor);
+            user.Deactivate(SystemActors.System);
         }
 
         return user;

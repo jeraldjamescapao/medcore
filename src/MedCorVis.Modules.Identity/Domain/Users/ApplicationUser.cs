@@ -32,6 +32,8 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity, IDel
     public bool IsActive { get; private set; } = true;
     
     // Soft Delete
+    // DeletionRequestedAtUtc: user has requested deletion, pending processing
+    // IsDeleted: deletion has been processed
     public bool             IsDeleted     { get; private set; }
     public DateTimeOffset?  DeletedAtUtc  { get; private set; }
     public string?          DeletedBy     { get; private set; }
@@ -43,9 +45,10 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity, IDel
     public string CreatedBy { get; private set; } = null!;
     public string? ModifiedBy { get; private set; }
     
+    // Computed
     public string FullName => $"{FirstName} {LastName}";
     public string FullNameInverted => $"{LastName}, {FirstName}";
-    public string FullNameWithInitials =>
+    public string AbbreviatedName =>
         FirstName.Length > 0 ? $"{FirstName[0]}. {LastName}" : LastName;
 
     #endregion
@@ -217,18 +220,17 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity, IDel
         var trimmedDeletedBy = DomainGuards.RequireNonEmpty(
             deletedBy, "DOMAIN_USER_INVALID_DELETED_BY", "DeletedBy is required.");
 
-        Anonymise(trimmedDeletedBy);
+        Anonymise();
 
         IsDeleted              = true;
         DeletedAtUtc           = DateTimeOffset.UtcNow;
         DeletedBy              = trimmedDeletedBy;
         IsActive               = false;
-        DeletionRequestedAtUtc = null;
         ModifiedAtUtc          = DateTimeOffset.UtcNow;
         ModifiedBy             = trimmedDeletedBy;
     }
     
-    private void Anonymise(string deletedBy)
+    private void Anonymise()
     {
         Email               = $"deleted_{Id}@deleted.invalid";
         UserName            = $"deleted_{Id}@deleted.invalid";
