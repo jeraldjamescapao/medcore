@@ -16,8 +16,11 @@ I wanted a codebase where every decision has a reason I can defend, not just cod
 SHA-256 token hashing, HttpOnly cookie delivery, email confirmation via MailKit,
 role-based access control, and a background cleanup service for expired refresh tokens.
 
-**Users** — profile management with culture preference per user. User ID is always
-resolved from the JWT token instead of client input to prevent IDOR.
+**Users** — profile management, culture preference, and account deletion workflow.
+Users submit deletion requests through a self-service endpoint. Admin and MedicalSecretary
+staff review and approve requests. On approval, PII fields are anonymised in place and
+the row is retained for referential integrity. User ID is always resolved from the JWT
+token instead of client input to prevent IDOR.
 
 **Localization** — translations stored in SQL Server, served from an in-memory cache
 with explicit admin-triggered refresh and a culture fallback chain (e.g. `fr-CH → fr → en`).
@@ -30,7 +33,7 @@ Seed data covers Swiss clinic and hospital conventions in English, French, and G
 
 ## Tests
 
-144 unit tests across four projects using xUnit, NSubstitute, and FluentAssertions.
+156 unit tests across four projects using xUnit, NSubstitute, and FluentAssertions.
 Service tests use substituted infrastructure dependencies. Domain tests call entity
 methods directly with no infrastructure involved.
 

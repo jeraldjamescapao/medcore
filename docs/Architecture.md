@@ -224,11 +224,34 @@ range validation. Any request contract with a date range can use it.
 
 The Users module shares the `Identity.Users` table with the Identity module via
 `UserManager<ApplicationUser>`. This is a known tradeoff in a modular monolith.
-Identity owns credentials and tokens.
-The Users module owns profile data.
+Identity owns credentials and tokens. The Users module owns profile data and account
+lifecycle.
+
+The module exposes two controllers:
+
+- `UsersController` — staff-facing endpoints for Admin and MedicalSecretary. Handles
+  pending deletion request queries and deletion execution.
+- `UsersConsumerController` — self-service endpoints for any authenticated user.
+  Handles profile, culture, phone, and deletion request submission and cancellation.
+
+User deletion follows a request-and-approve workflow:
+
+1. User submits a deletion request via `POST /users/me/deletion-request`.
+2. Admin or MedicalSecretary reviews pending requests via `GET /users/deletion-requests`.
+3. Staff executes deletion via `POST /users/{id}/delete`.
+4. On execution, PII fields are anonymised in place. The row is retained for
+   referential integrity with patient records and appointment history.
+5. `BirthDate` is kept on the anonymised row for statistical purposes.
+
+`ApplicationUser` implements `IDeletableEntity` from `MedCorVis.Common.Auditing`.
+The global query filter is applied manually inside `IdentityDbContext` because
+`IdentityDbContext` cannot inherit `BaseDbContext` — ASP.NET Identity requires its
+own DbContext base class. This is a documented exception to the `BaseDbContext` pattern.
 
 On future extraction to microservices, Identity would publish a `UserRegisteredEvent`
-and Users would maintain its own copy of profile data in a separate database.
+and Users would maintain its own `UserProfile` table with a dedicated DbContext and
+repository. `UserDeletionService` would then query `UserProfile` directly instead of
+`UserManager.Users`.
 
 ## API Versioning
 
@@ -254,7 +277,8 @@ Log event ID ranges by module:
 | 4000s     | Localization                          |
 | 5001-5008 | Seeders (RoleSeeder, AdminUserSeeder) |
 | 6000s     | CodeItems                             |
-| 7000s     | Next available                        |
+| 7000s     | Patients (next)                       |
+| 8000s     | Next available after Patients         |
 
 ## Testing
 
