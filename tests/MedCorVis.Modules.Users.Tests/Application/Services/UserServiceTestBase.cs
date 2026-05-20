@@ -35,5 +35,4 @@ public abstract class UserServiceTestBase
             birthDate: new DateOnly(1988, 6, 27),
             createdBy: ApplicationUser.SelfRegisteredActor);
     }
-        
 }
