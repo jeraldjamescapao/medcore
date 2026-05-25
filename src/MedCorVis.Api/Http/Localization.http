@@ -1,0 +1,104 @@
+@MedCorVis_HostAddress = https://localhost:7212
+@ContentType = application/json
+
+# Copy an access token from a login or register response and paste it here.
+@AccessToken = 
+
+###
+
+# ─────────────────────────────────────────
+# Localization — Refresh Translation Cache
+# Clears and reloads the in-memory translation cache from the database.
+# Use this after updating a translation row directly in the DB.
+# Requires: valid Bearer token with Admin role.
+# Returns: 204 No Content.
+# ─────────────────────────────────────────
+
+POST {{MedCorVis_HostAddress}}/api/v1/translations/cache/refresh
+Authorization: Bearer {{AccessToken}}
+
+###
+
+# ─────────────────────────────────────────
+# Localization — Get All Translations
+# Returns all translations, optionally filtered by culture.
+# Supported culture values: en, fr, de, fr-CH, de-CH
+# Requires: valid Bearer token with Admin role.
+# Returns: 200 with list of translations.
+# ─────────────────────────────────────────
+
+GET {{MedCorVis_HostAddress}}/api/v1/translations
+Authorization: Bearer {{AccessToken}}
+
+###
+
+# ─────────────────────────────────────────
+# Localization — Get All Translations by Culture
+# Requires: valid Bearer token with Admin role.
+# Returns: 200 with filtered list of translations.
+# ─────────────────────────────────────────
+
+GET {{MedCorVis_HostAddress}}/api/v1/translations?culture=fr
+Authorization: Bearer {{AccessToken}}
+
+###
+
+# ─────────────────────────────────────────
+# Localization — Get Translation by ID
+# Requires: valid Bearer token with Admin role.
+# Returns: 200 with translation, or 404 if not found.
+# ─────────────────────────────────────────
+
+GET {{MedCorVis_HostAddress}}/api/v1/translations/1
+Authorization: Bearer {{AccessToken}}
+
+###
+
+# ─────────────────────────────────────────
+# Localization — Create Translation
+# Requires: valid Bearer token with Admin role.
+# Returns: 201 with created translation.
+# ─────────────────────────────────────────
+
+POST {{MedCorVis_HostAddress}}/api/v1/translations
+Content-Type: {{ContentType}}
+Authorization: Bearer {{AccessToken}}
+
+{
+  "culture": "en",
+  "key": "app.general.get_well_soon",
+  "value": "Get well soon!",
+  "description": "Get well soon wish."
+}
+
+###
+
+# ─────────────────────────────────────────
+# Localization — Update Translation
+# Culture and Key are not updatable.
+# Requires: valid Bearer token with Admin role.
+# Returns: 200 with updated translation.
+# ─────────────────────────────────────────
+
+PUT {{MedCorVis_HostAddress}}/api/v1/translations/1
+Content-Type: {{ContentType}}
+Authorization: Bearer {{AccessToken}}
+
+{
+  "value": "MedCorVis by Jerald James Capao © 2026",
+  "description": "Updated general app name."
+}
+
+###
+
+# ─────────────────────────────────────────
+# Localization — Delete Translation (Soft)
+# Sets IsActive to false. Preserves audit trail.
+# Requires: valid Bearer token with Admin role.
+# Returns: 204 No Content.
+# ─────────────────────────────────────────
+
+DELETE {{MedCorVis_HostAddress}}/api/v1/translations/1
+Authorization: Bearer {{AccessToken}}
+
+###
