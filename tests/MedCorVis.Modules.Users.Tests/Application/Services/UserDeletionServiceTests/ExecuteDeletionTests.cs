@@ -65,7 +65,7 @@ public sealed class ExecuteDeletionTests : UserDeletionServiceTestBase
     }
     
     [Fact]
-    public async Task ExecuteDeletionAsync_ValidRequest_SetsIsDeletedAndAnonymisesPii()
+    public async Task ExecuteDeletionAsync_ValidRequest_SetsIsDeletedAndAnonymisesIdentityPii()
     {
         var user = CreateUser();
 
@@ -77,6 +77,8 @@ public sealed class ExecuteDeletionTests : UserDeletionServiceTestBase
             .UpdateAsync(user)
             .Returns(IdentityResult.Success);
 
+        SetupAnonymise(TargetUserId);
+
         var result = await Sut.ExecuteDeletionAsync(TargetUserId);
 
         result.IsSuccess.Should().BeTrue();
@@ -84,11 +86,7 @@ public sealed class ExecuteDeletionTests : UserDeletionServiceTestBase
         user.IsActive.Should().BeFalse();
         user.DeletedAtUtc.Should().NotBeNull();
         user.Email.Should().StartWith("deleted_");
-        user.FirstName.Should().Be("Deleted");
-        user.LastName.Should().Be("User");
         user.PhoneNumber.Should().BeNull();
-        await UserManager
-            .Received(1)
-            .UpdateAsync(user);
+        await VerifyAnonymiseCalledOnce(TargetUserId);
     }
 }

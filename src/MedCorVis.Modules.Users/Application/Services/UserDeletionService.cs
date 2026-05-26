@@ -5,31 +5,32 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MedCorVis.Common.Results;
 using MedCorVis.Common.Services;
+using MedCorVis.Common.UserProfiles;
 using MedCorVis.Modules.Identity.Domain.Users;
 using MedCorVis.Modules.Users.Application.Abstractions;
 using MedCorVis.Modules.Users.Application.Contracts.Responses;
 using MedCorVis.Modules.Users.Application.Errors;
 using MedCorVis.Modules.Users.Application.Logging;
 
-// Note: This service queries ApplicationUser directly via UserManager<ApplicationUser>.
-// The Users module has no dedicated DbContext or repository — it shares the Identity
-// module's user store through UserManager, which is the established pattern here.
-// Future: When User and UserProfile are split into separate tables, this service
-// will query UserProfile via a dedicated Users repository instead of UserManager.Users.
-// GetPendingDeletionRequestsAsync will be the first method to migrate.
 internal sealed class UserDeletionService : IUserDeletionService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IUserProfileService _userProfileService;
+    private readonly IUserProfileRepository _userProfileRepository;
     private readonly ILogger<UserDeletionService> _logger;
 
     public UserDeletionService(
         UserManager<ApplicationUser> userManager,
         ICurrentUserService currentUserService,
+        IUserProfileService userProfileService,
+        IUserProfileRepository userProfileRepository,
         ILogger<UserDeletionService> logger)
     {
         _userManager = userManager;
         _currentUserService = currentUserService;
+        _userProfileService = userProfileService;
+        _userProfileRepository = userProfileRepository;
         _logger = logger;
     }
     
@@ -96,16 +97,30 @@ internal sealed class UserDeletionService : IUserDeletionService
     public async Task<Result<IReadOnlyList<DeletionRequestResponse>>> GetPendingDeletionRequestsAsync(
         CancellationToken ct = default)
     {
-        var users = await _userManager.Users
+        var pendingUsers = await _userManager.Users
             .AsNoTracking()
             .Where(u => u.DeletionRequestedAtUtc != null)
-            .OrderBy(u => u.DeletionRequestedAtUtc)
             .ToListAsync(ct);
 
-        var response = users
+        if (pendingUsers.Count == 0)
+            return Result<IReadOnlyList<DeletionRequestResponse>>.Success([]);
+
+        var userIds = pendingUsers
+            .Select(u => u.Id)
+            .ToList();
+
+        var profiles = 
+            await _userProfileRepository.GetByUserIdsAsync(userIds, ct);
+
+        var profileMap = 
+            profiles.ToDictionary(p => p.UserId);
+
+        var response = pendingUsers
+            .Where(u => profileMap.ContainsKey(u.Id))
+            .OrderBy(u => u.DeletionRequestedAtUtc)
             .Select(u => new DeletionRequestResponse(
                 u.Id,
-                u.FullName,
+                profileMap[u.Id].FullName,
                 u.Email!,
                 u.DeletionRequestedAtUtc!.Value))
             .ToList();
@@ -139,6 +154,8 @@ internal sealed class UserDeletionService : IUserDeletionService
             UserLogMessages.UserDeletionFailed(_logger, targetUserId, null);
             return Result<bool>.Internal(UserErrors.DeletionFailed);
         }
+        
+        await _userProfileService.AnonymiseProfileAsync(targetUserId, actorId.ToString(), ct);
 
         UserLogMessages.UserDeletedSuccessfully(_logger, targetUserId, actorId, null);
         return Result<bool>.Success(true);
