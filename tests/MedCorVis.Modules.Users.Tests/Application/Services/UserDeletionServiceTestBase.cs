@@ -59,9 +59,6 @@ public abstract class UserDeletionServiceTestBase
     {
         return ApplicationUser.Create(
             email: email ?? "jjcapaotest@softwareengineers.ch",
-            firstName: "Jerald James Capao",
-            lastName: "Test",
-            birthDate: new DateOnly(1988, 6, 27),
             createdBy: ApplicationUser.SelfRegisteredActor);
     }
     

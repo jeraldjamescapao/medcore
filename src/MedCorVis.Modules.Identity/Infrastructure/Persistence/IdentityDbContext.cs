@@ -27,18 +27,6 @@ internal sealed class IdentityDbContext
         builder.Entity<ApplicationUser>(entity =>
         {
             entity.ToTable("Users");
-
-            entity.Property(x => x.FirstName)
-                .IsRequired()
-                .HasMaxLength(ApplicationUser.FirstNameMaxLength);
-
-            entity.Property(x => x.LastName)
-                .IsRequired()
-                .HasMaxLength(ApplicationUser.LastNameMaxLength);
-            
-            entity.Property(x => x.BirthDate)
-                .HasColumnType("date")
-                .IsRequired();
             
             entity.Property(x => x.PreferredCulture)
                 .HasMaxLength(ApplicationUser.PreferredCultureMaxLength)

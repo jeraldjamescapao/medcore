@@ -72,9 +72,6 @@ internal sealed class AuthService : IAuthService
         
         var user = ApplicationUser.Create(
             request.Email,
-            request.FirstName,
-            request.LastName,
-            request.BirthDate,
             createdBy: ApplicationUser.SelfRegisteredActor,
             request.Culture);
         

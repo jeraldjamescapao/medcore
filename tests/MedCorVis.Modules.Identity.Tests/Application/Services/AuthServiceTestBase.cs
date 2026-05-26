@@ -79,26 +79,20 @@ public abstract class AuthServiceTestBase
     }
     
     protected static ApplicationUser CreateUser(
-        string email     = "jjcapaotest@softwareengineers.ch",
-        bool isActive    = true,
-        bool emailConfirmed = false)
+        string email        = "jjcapaotest@softwareengineers.ch",
+        bool   isActive     = true,
+        bool   emailConfirmed = false)
     {
         var user = ApplicationUser.Create(
             email,
-            "Jerald James Capao",
-            "Test",
-            new DateOnly(1988, 6, 27),
-            ApplicationUser.SelfRegisteredActor);
+            createdBy: ApplicationUser.SelfRegisteredActor);
 
-        // EmailConfirmed has no setter — use reflection to set it for testing.
         typeof(ApplicationUser)
             .GetProperty(nameof(ApplicationUser.EmailConfirmed))!
             .SetValue(user, emailConfirmed);
 
         if (!isActive)
-        {
             user.Deactivate(SystemActors.System);
-        }
 
         return user;
     }

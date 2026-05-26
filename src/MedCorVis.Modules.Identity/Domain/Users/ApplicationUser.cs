@@ -9,10 +9,6 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity, IDel
     #region Constants
     
     public const string SelfRegisteredActor = "Self";
-    public const int FirstNameMinLength = 2;
-    public const int FirstNameMaxLength = 100;
-    public const int LastNameMinLength = 2;
-    public const int LastNameMaxLength = 100;
     public const int EmailMaxLength = 256;
     public const int PreferredCultureMaxLength = 10;    
     public const int PasswordMinLength = 8;
@@ -22,10 +18,7 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity, IDel
     
     #region Properties
     
-    // User Profile
-    public string FirstName { get; private set; } = null!;
-    public string LastName { get; private set; } = null!;
-    public DateOnly BirthDate { get; private set; }
+    // Account Preferences
     public string? PreferredCulture { get; private set; }
     
     // Visibility
@@ -44,12 +37,6 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity, IDel
     public DateTimeOffset? ModifiedAtUtc { get; private set; }
     public string CreatedBy { get; private set; } = null!;
     public string? ModifiedBy { get; private set; }
-    
-    // Computed
-    public string FullName => $"{FirstName} {LastName}";
-    public string FullNameInverted => $"{LastName}, {FirstName}";
-    public string AbbreviatedName =>
-        FirstName.Length > 0 ? $"{FirstName[0]}. {LastName}" : LastName;
 
     #endregion
     
@@ -59,9 +46,6 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity, IDel
 
     private ApplicationUser(
         string email,
-        string firstName,
-        string lastName,
-        DateOnly birthDate,
         string createdBy,
         string? preferredCulture)
     {
@@ -69,9 +53,6 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity, IDel
         
         Email = email;
         UserName = email;
-        FirstName = firstName;
-        LastName = lastName;
-        BirthDate = birthDate;
         PreferredCulture = preferredCulture;
         CreatedAtUtc = DateTimeOffset.UtcNow;
         CreatedBy = createdBy;
@@ -84,32 +65,19 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity, IDel
 
     public static ApplicationUser Create(
         string email,
-        string firstName,
-        string lastName,
-        DateOnly birthDate,
         string createdBy,
         string? preferredCulture = null)
     {
         var trimmedEmail = DomainGuards.RequireNonEmpty(
             email, "DOMAIN_USER_INVALID_EMAIL", "Email is required.");
-        var trimmedFirstName = DomainGuards.RequireNonEmpty(
-            firstName, "DOMAIN_USER_INVALID_FIRST_NAME", "FirstName is required.");
-        var trimmedLastName = DomainGuards.RequireNonEmpty(
-            lastName, "DOMAIN_USER_INVALID_LAST_NAME", "LastName is required.");
         var trimmedCulture = DomainGuards.RequireValidCulture(
             preferredCulture, "DOMAIN_USER_INVALID_CULTURE", "Unsupported culture.");
         var trimmedCreatedBy = DomainGuards.RequireNonEmpty(
             createdBy, "DOMAIN_USER_INVALID_CREATED_BY", "CreatedBy is required.", 
             IAuditableEntity.CreatedByMaxLength);
         
-        DomainGuards.RequirePastOrPresentDate(birthDate, 
-            "DOMAIN_USER_INVALID_BIRTH_DATE", "BirthDate cannot be in the future.");
-        
         return new ApplicationUser(
-            trimmedEmail, 
-            trimmedFirstName, 
-            trimmedLastName, 
-            birthDate,
+            trimmedEmail,
             trimmedCreatedBy,
             trimmedCulture);
     }
@@ -117,41 +85,6 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity, IDel
     #endregion
     
     #region Methods
-
-    public void UpdateProfile(
-        string firstName, 
-        string lastName, 
-        DateOnly birthDate, 
-        string modifiedBy)
-    {
-        var trimmedFirstName = DomainGuards.RequireNonEmpty(
-            firstName, "DOMAIN_USER_INVALID_FIRST_NAME", "FirstName is required.");
-        var trimmedLastName = DomainGuards.RequireNonEmpty(
-            lastName, "DOMAIN_USER_INVALID_LAST_NAME", "LastName is required.");
-        var trimmedModifiedBy = DomainGuards.RequireNonEmpty(
-            modifiedBy, "DOMAIN_USER_INVALID_MODIFIED_BY", "ModifiedBy is required.",
-            IAuditableEntity.ModifiedByMaxLength);
-        
-        DomainGuards.RequirePastOrPresentDate(birthDate, 
-            "DOMAIN_USER_INVALID_BIRTH_DATE", "BirthDate cannot be in the future.");
-        
-        var nameChanged = trimmedFirstName != FirstName || trimmedLastName != LastName;
-        var birthDateChanged = birthDate != BirthDate;
-        
-        if (!nameChanged && !birthDateChanged) return;
-        
-        if (nameChanged)
-        {
-            FirstName = trimmedFirstName;
-            LastName = trimmedLastName;
-        }
-
-        if (birthDateChanged)
-            BirthDate = birthDate;
-        
-        ModifiedAtUtc = DateTimeOffset.UtcNow;
-        ModifiedBy = trimmedModifiedBy;
-    }
     
     public void UpdatePreferredCulture(string culture, string modifiedBy)
     {
@@ -236,8 +169,6 @@ public sealed class ApplicationUser : IdentityUser<Guid>, IAuditableEntity, IDel
         UserName            = $"deleted_{Id}@deleted.invalid";
         NormalizedEmail     = $"DELETED_{Id}@DELETED.INVALID";
         NormalizedUserName  = $"DELETED_{Id}@DELETED.INVALID";
-        FirstName           = "Deleted";
-        LastName            = "User";
         PhoneNumber         = null;
     }
     
