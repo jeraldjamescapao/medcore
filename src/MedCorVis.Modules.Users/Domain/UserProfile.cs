@@ -85,7 +85,7 @@ public sealed class UserProfile : IAuditableEntity, IDeletableEntity
 
         var trimmedLastName = DomainGuards.RequireValidLengthRange(
             lastName, 
-            "DOMAIN_USERPROFILE_INVALID_FIRST_NAME", 
+            "DOMAIN_USERPROFILE_INVALID_LAST_NAME", 
             $"LastName must be between {LastNameMinLength} and {LastNameMaxLength} characters.", 
             LastNameMinLength, 
             LastNameMaxLength);
@@ -94,7 +94,7 @@ public sealed class UserProfile : IAuditableEntity, IDeletableEntity
             createdBy, "DOMAIN_USERPROFILE_INVALID_CREATED_BY", "CreatedBy is required.");
 
         DomainGuards.RequirePastOrPresentDate(birthDate, 
-            "DOMAIN_USER_INVALID_BIRTH_DATE", "BirthDate cannot be in the future.");
+            "DOMAIN_USERPROFILE_INVALID_BIRTH_DATE", "BirthDate cannot be in the future.");
 
         return new UserProfile(
             userId,
@@ -123,7 +123,7 @@ public sealed class UserProfile : IAuditableEntity, IDeletableEntity
 
         var trimmedLastName = DomainGuards.RequireValidLengthRange(
             lastName, 
-            "DOMAIN_USERPROFILE_INVALID_FIRST_NAME", 
+            "DOMAIN_USERPROFILE_INVALID_LAST_NAME", 
             $"LastName must be between {LastNameMinLength} and {LastNameMaxLength} characters.", 
             LastNameMinLength, 
             LastNameMaxLength);
@@ -132,7 +132,7 @@ public sealed class UserProfile : IAuditableEntity, IDeletableEntity
             modifiedBy, "DOMAIN_USERPROFILE_INVALID_MODIFIED_BY", "ModifiedBy is required.");
 
         DomainGuards.RequirePastOrPresentDate(birthDate, 
-            "DOMAIN_USER_INVALID_BIRTH_DATE", "BirthDate cannot be in the future.");
+            "DOMAIN_USERPROFILE_INVALID_BIRTH_DATE", "BirthDate cannot be in the future.");
 
         var nameChanged      = trimmedFirstName != FirstName || trimmedLastName != LastName;
         var birthDateChanged = birthDate != BirthDate;
