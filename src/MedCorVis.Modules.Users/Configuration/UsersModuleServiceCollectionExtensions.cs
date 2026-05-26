@@ -3,6 +3,7 @@ namespace MedCorVis.Modules.Users.Configuration;
 using MedCorVis.Modules.Users.Application.Abstractions;
 using MedCorVis.Modules.Users.Application.Services;
 using MedCorVis.Modules.Users.Infrastructure.Persistence;
+using MedCorVis.Modules.Users.Infrastructure.Persistence.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +23,8 @@ internal static class UsersModuleServiceCollectionExtensions
 
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserDeletionService, UserDeletionService>();
+        services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+        services.AddScoped<IUserProfileService, UserProfileService>();
 
         return services;
     }

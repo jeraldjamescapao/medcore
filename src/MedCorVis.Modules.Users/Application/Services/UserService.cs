@@ -12,7 +12,6 @@ using MedCorVis.Modules.Users.Application.Contracts.Responses;
 using MedCorVis.Modules.Users.Application.Errors;
 using MedCorVis.Modules.Users.Application.Logging;
 
-
 internal sealed class UserService : IUserService
 {
     private readonly UserManager<ApplicationUser> _userManager;
