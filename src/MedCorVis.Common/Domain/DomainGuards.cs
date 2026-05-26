@@ -18,6 +18,19 @@ public static class DomainGuards
     
         return trimmed;
     }
+
+    public static string RequireValidLengthRange(
+        string value, string code, string message, int minLength, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(value) ||
+            value.Length < minLength ||
+            value.Length > maxLength)
+        {
+            throw new DomainException(code, message);
+        }
+        
+        return value.Trim();   
+    }
     
     public static Guid RequireNonEmptyGuid(Guid value, string code, string message)
     {
