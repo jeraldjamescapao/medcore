@@ -128,6 +128,12 @@ Apply CodeItems migrations:
 dotnet ef database update --project src/MedCorVis.Modules.CodeItems/MedCorVis.Modules.CodeItems.csproj --startup-project src/MedCorVis.Api/MedCorVis.Api.csproj --context CodeItemsDbContext
 ```
 
+Apply Users migrations:
+
+```bash
+dotnet ef database update --project src/MedCorVis.Modules.Users/MedCorVis.Modules.Users.csproj --startup-project src/MedCorVis.Api/MedCorVis.Api.csproj --context UsersDbContext
+```
+
 ### Run the API
 
 From the solution root:
@@ -198,7 +204,7 @@ Patients, Doctors, and Appointments modules are next.
 
 Jerald James Capao — Software Engineer
 
-GitHub: `https://github.com/jeraldjamescapao`
+GitHub: [github.com/jeraldjamescapao](https://github.com/jeraldjamescapao)
 
 Architecture, domain modeling, and technical decisions are all my own.
 AI tools such as Anthropic Claude are used for development support.

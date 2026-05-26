@@ -149,8 +149,9 @@ with a per-field breakdown:
 
 ## Cross-Module Communication
 
-Modules do not reference each other's assemblies. Cross-module references use `Guid`
-only — no EF navigation properties across module boundaries.
+Modules do not reference each other's assemblies where possible. Cross-module
+references use `Guid` only — no EF navigation properties across module boundaries.
+The one current exception is documented in the Users Module section.
 
 `ICurrentUserService` (in `MedCorVis.Common`) is injected wherever business logic needs
 the caller's identity. User ID is always resolved from the validated JWT token.
@@ -222,36 +223,33 @@ range validation. Any request contract with a date range can use it.
 
 ## Users Module
 
-The Users module shares the `Identity.Users` table with the Identity module via
-`UserManager<ApplicationUser>`. This is a known tradeoff in a modular monolith.
-Identity owns credentials and tokens. The Users module owns profile data and account
-lifecycle.
+The Users module owns profile data (`Profiles.Users`) and account lifecycle operations.
+It maintains a dedicated `UsersDbContext` with its own migrations and repository layer.
+
+Profile data (`FirstName`, `LastName`, `BirthDate`) lives in `Profiles.Users` via the
+`UserProfile` entity. Identity fields (`Email`, `PhoneNumber`, `PreferredCulture`,
+`IsActive`, `IsDeleted`, `DeletionRequestedAtUtc`) remain on `Identity.Users`.
 
 The module exposes two controllers:
 
-- `UsersController` — staff-facing endpoints for Admin and MedicalSecretary. Handles
-  pending deletion request queries and deletion execution.
+- `UsersController` — staff-facing endpoints for Admin and MedicalSecretary.
 - `UsersConsumerController` — self-service endpoints for any authenticated user.
-  Handles profile, culture, phone, and deletion request submission and cancellation.
 
 User deletion follows a request-and-approve workflow:
 
 1. User submits a deletion request via `POST /users/me/deletion-request`.
 2. Admin or MedicalSecretary reviews pending requests via `GET /users/deletion-requests`.
 3. Staff executes deletion via `POST /users/{id}/delete`.
-4. On execution, PII fields are anonymised in place. The row is retained for
-   referential integrity with patient records and appointment history.
-5. `BirthDate` is kept on the anonymised row for statistical purposes.
+4. On execution, PII fields are anonymised in both `Identity.Users` and `Profiles.Users`.
+5. `BirthDate` is kept on the anonymised `UserProfile` row for statistical purposes.
 
-`ApplicationUser` implements `IDeletableEntity` from `MedCorVis.Common.Auditing`.
-The global query filter is applied manually inside `IdentityDbContext` because
-`IdentityDbContext` cannot inherit `BaseDbContext` — ASP.NET Identity requires its
-own DbContext base class. This is a documented exception to the `BaseDbContext` pattern.
-
-On future extraction to microservices, Identity would publish a `UserRegisteredEvent`
-and Users would maintain its own `UserProfile` table with a dedicated DbContext and
-repository. `UserDeletionService` would then query `UserProfile` directly instead of
-`UserManager.Users`.
+Cross-module boundary: `UserService` and `UserDeletionService` still inject
+`UserManager<ApplicationUser>` for culture, phone, and deletion lifecycle operations.
+This is a known architectural tradeoff — the deletion lifecycle (`RequestDeletion`,
+`CancelDeletionRequest`, `Delete`) is implemented as domain methods on `ApplicationUser`,
+which belongs to Identity. A future refactor will move deletion lifecycle management
+into an Identity-owned service interface, fully decoupling the Users module from
+the Identity project reference.
 
 ## API Versioning
 
