@@ -9,6 +9,8 @@ public interface IUserProfileService
         DateOnly birthDate,
         string createdBy,
         CancellationToken ct = default);
+    
+    Task<string?> GetFullNameAsync(Guid userId, CancellationToken ct = default);
 
     Task AnonymiseProfileAsync(Guid userId, string deletedBy, CancellationToken ct = default);
 }

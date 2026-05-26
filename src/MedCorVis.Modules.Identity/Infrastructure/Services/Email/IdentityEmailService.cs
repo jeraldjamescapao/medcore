@@ -6,7 +6,6 @@ using MedCorVis.Common.Localization;
 using MedCorVis.Common.Services.Email;
 using MedCorVis.Modules.Identity.Application.Abstractions.Email;
 using MedCorVis.Modules.Identity.Configuration;
-using MedCorVis.Modules.Identity.Domain.Users;
 
 internal sealed class IdentityEmailService : IIdentityEmailService
 {
@@ -28,19 +27,21 @@ internal sealed class IdentityEmailService : IIdentityEmailService
     }
     
     public async Task SendConfirmationEmailAsync(
-        ApplicationUser user, 
+        Guid userId,
+        string email,
+        string fullName,
         string encodedToken,
         string culture,
         CancellationToken ct = default)
     {
         var confirmationLink = 
             $"{_frontendSettings.NormalizedBaseUrl}{_identityTokenSettings.NormalizedEmailConfirmationPath}" +
-            $"?userId={user.Id}&token={encodedToken}";
+            $"?userId={userId}&token={encodedToken}";
         
         var translations = new ConfirmationEmailTranslations(
             Subject: _localizer.Get(TranslationKeys.EmailConfirmation.Subject, culture),
-            Greeting: string.Format(_localizer.Get(TranslationKeys.EmailConfirmation.Greeting, culture), 
-                user.FullName),
+            Greeting: string.Format(_localizer
+                .Get(TranslationKeys.EmailConfirmation.Greeting, culture), fullName),
             Instruction: _localizer.Get(TranslationKeys.EmailConfirmation.Instruction, culture),
             LinkLabel: _localizer.Get(TranslationKeys.EmailConfirmation.LinkLabel, culture),
             Expiry: string.Format(_localizer.Get(TranslationKeys.EmailConfirmation.Expiry, culture), 
@@ -50,7 +51,7 @@ internal sealed class IdentityEmailService : IIdentityEmailService
             AppName: _localizer.Get(TranslationKeys.AppGeneral.Name, culture));
         
         var message = new EmailMessage(
-            To: user.Email!,
+            To: email,
             Subject: translations.Subject,
             HtmlBody: BuildHtmlBody(confirmationLink, translations),
             PlainTextBody: BuildPlainTextBody(confirmationLink, translations));

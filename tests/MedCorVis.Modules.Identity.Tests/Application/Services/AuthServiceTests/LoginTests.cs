@@ -16,7 +16,9 @@ public sealed class LoginTests : AuthServiceTestBase
     [Fact]
     public async Task LoginAsync_UserNotFound_ReturnsUnauthorized()
     {
-        UserManager.FindByEmailAsync(ValidRequest.Email).Returns((ApplicationUser?)null);
+        UserManager
+            .FindByEmailAsync(ValidRequest.Email)
+            .Returns((ApplicationUser?)null);
 
         var result = await Sut.LoginAsync(ValidRequest);
 
@@ -32,7 +34,10 @@ public sealed class LoginTests : AuthServiceTestBase
     public async Task LoginAsync_AccountDeactivated_ReturnsUnauthorized()
     {
         var user = CreateUser(ValidRequest.Email, isActive: false);
-        UserManager.FindByEmailAsync(ValidRequest.Email).Returns(user);
+        
+        UserManager
+            .FindByEmailAsync(ValidRequest.Email)
+            .Returns(user);
 
         var result = await Sut.LoginAsync(ValidRequest);
 
@@ -48,7 +53,10 @@ public sealed class LoginTests : AuthServiceTestBase
     public async Task LoginAsync_EmailNotConfirmed_ReturnsUnprocessableEntity()
     {
         var user = CreateUser(ValidRequest.Email, isActive: true, emailConfirmed: false);
-        UserManager.FindByEmailAsync(ValidRequest.Email).Returns(user);
+        
+        UserManager
+            .FindByEmailAsync(ValidRequest.Email)
+            .Returns(user);
 
         var result = await Sut.LoginAsync(ValidRequest);
 
@@ -64,8 +72,14 @@ public sealed class LoginTests : AuthServiceTestBase
     public async Task LoginAsync_InvalidPassword_ReturnsUnauthorized()
     {
         var user = CreateUser(ValidRequest.Email, isActive: true, emailConfirmed: true);
-        UserManager.FindByEmailAsync(ValidRequest.Email).Returns(user);
-        UserManager.CheckPasswordAsync(user, ValidRequest.Password).Returns(false);
+        
+        UserManager
+            .FindByEmailAsync(ValidRequest.Email)
+            .Returns(user);
+        
+        UserManager
+            .CheckPasswordAsync(user, ValidRequest.Password)
+            .Returns(false);
 
         var result = await Sut.LoginAsync(ValidRequest);
 
@@ -81,9 +95,20 @@ public sealed class LoginTests : AuthServiceTestBase
     public async Task LoginAsync_ValidCredentials_ReturnsSuccessWithCorrectShape()
     {
         var user = CreateUser(ValidRequest.Email, isActive: true, emailConfirmed: true);
-        UserManager.FindByEmailAsync(ValidRequest.Email).Returns(user);
-        UserManager.CheckPasswordAsync(user, ValidRequest.Password).Returns(true);
-        UserManager.GetRolesAsync(user).Returns(["Patient"]);
+        
+        UserManager
+            .FindByEmailAsync(ValidRequest.Email)
+            .Returns(user);
+        
+        UserManager
+            .CheckPasswordAsync(user, ValidRequest.Password)
+            .Returns(true);
+        
+        UserManager
+            .GetRolesAsync(user)
+            .Returns(["Patient"]);
+        
+        SetupUserProfileFullName(user.Id, "Jerald James Capao Test");
 
         var result = await Sut.LoginAsync(ValidRequest);
 

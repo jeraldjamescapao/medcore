@@ -5,8 +5,10 @@ using MedCorVis.Modules.Identity.Domain.Users;
 internal interface IIdentityEmailService
 {
     Task SendConfirmationEmailAsync(
-        ApplicationUser user, 
-        string encodedToken, 
+        Guid userId,
+        string email,
+        string fullName,
+        string encodedToken,
         string culture,
         CancellationToken ct = default);
 }

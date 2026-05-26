@@ -24,7 +24,9 @@ public sealed class ResendConfirmationEmailTests : AuthServiceTestBase
         await IdentityEmailService
             .DidNotReceive()
             .SendConfirmationEmailAsync(
-                Arg.Any<ApplicationUser>(), 
+                Arg.Any<Guid>(),
+                Arg.Any<string>(), 
+                Arg.Any<string>(), 
                 Arg.Any<string>(), 
                 Arg.Any<string>(), 
                 Arg.Any<CancellationToken>());
@@ -43,7 +45,9 @@ public sealed class ResendConfirmationEmailTests : AuthServiceTestBase
         await IdentityEmailService
             .DidNotReceive()
             .SendConfirmationEmailAsync(
-                Arg.Any<ApplicationUser>(), 
+                Arg.Any<Guid>(),
+                Arg.Any<string>(), 
+                Arg.Any<string>(), 
                 Arg.Any<string>(), 
                 Arg.Any<string>(), 
                 Arg.Any<CancellationToken>());
@@ -64,7 +68,9 @@ public sealed class ResendConfirmationEmailTests : AuthServiceTestBase
         
         IdentityEmailService
             .SendConfirmationEmailAsync(
-                user, 
+                Arg.Any<Guid>(),
+                Arg.Any<string>(), 
+                Arg.Any<string>(), 
                 Arg.Any<string>(), 
                 Arg.Any<string>(), 
                 Arg.Any<CancellationToken>())
@@ -92,7 +98,9 @@ public sealed class ResendConfirmationEmailTests : AuthServiceTestBase
         
         IdentityEmailService
             .SendConfirmationEmailAsync(
-                user, 
+                Arg.Any<Guid>(),
+                Arg.Any<string>(), 
+                Arg.Any<string>(), 
                 Arg.Any<string>(), 
                 Arg.Any<string>(), 
                 Arg.Any<CancellationToken>())
@@ -104,7 +112,9 @@ public sealed class ResendConfirmationEmailTests : AuthServiceTestBase
         await IdentityEmailService
             .Received(1)
             .SendConfirmationEmailAsync(
-                user, 
+                Arg.Any<Guid>(),
+                Arg.Any<string>(), 
+                Arg.Any<string>(), 
                 Arg.Any<string>(), 
                 Arg.Any<string>(), 
                 Arg.Any<CancellationToken>());

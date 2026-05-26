@@ -28,6 +28,12 @@ internal sealed class UserProfileService : IUserProfileService
         await _repository.SaveChangesAsync(ct);
     }
     
+    public async Task<string?> GetFullNameAsync(Guid userId, CancellationToken ct = default)
+    {
+        var profile = await _repository.GetByUserIdAsync(userId, ct);
+        return profile?.FullName;
+    }
+    
     public async Task AnonymiseProfileAsync(
         Guid userId, 
         string deletedBy, 

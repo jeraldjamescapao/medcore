@@ -113,7 +113,15 @@ internal sealed class AuthService : IAuthService
             
             var encodedToken = await GenerateEncodedConfirmationTokenAsync(user);
             var culture = user.PreferredCulture ?? _currentCultureService.Culture;
-            await _identityEmailService.SendConfirmationEmailAsync(user, encodedToken, culture, ct);
+            var fullName = $"{request.FirstName} {request.LastName}";
+            
+            await _identityEmailService.SendConfirmationEmailAsync(
+                user.Id,
+                user.Email!,
+                fullName,
+                encodedToken,
+                culture,
+                ct);
             
             await transaction.CommitAsync(ct);
             
@@ -122,7 +130,7 @@ internal sealed class AuthService : IAuthService
             return Result<RegisterResponse>.Success(new RegisterResponse(
                 user.Id,
                 user.Email!,
-                user.FullName,
+                fullName,
                 culture,
                 roles,
                 accessToken)
@@ -184,10 +192,13 @@ internal sealed class AuthService : IAuthService
         
         AuthLogMessages.LoginSucceeded(_logger, user.Id, user.Email!, null);
         
+        var fullName = await _userProfileService
+            .GetFullNameAsync(user.Id, ct) ?? user.Email!;
+        
         return Result<LoginResponse>.Success(new LoginResponse(
             user.Id,
             user.Email!,
-            user.FullName,
+            fullName,
             culture,
             roles,
             accessToken)
@@ -344,7 +355,17 @@ internal sealed class AuthService : IAuthService
         {
             var encodedToken = await GenerateEncodedConfirmationTokenAsync(user);
             var culture = user.PreferredCulture ?? _currentCultureService.Culture;
-            await _identityEmailService.SendConfirmationEmailAsync(user, encodedToken, culture, ct);
+            
+            var fullName = await _userProfileService
+                .GetFullNameAsync(user.Id, ct) ?? user.Email!;
+            
+            await _identityEmailService.SendConfirmationEmailAsync(
+                user.Id,
+                user.Email!,
+                fullName,
+                encodedToken,
+                culture,
+                ct);    
         }
         catch (EmailDeliveryException ex)
         {

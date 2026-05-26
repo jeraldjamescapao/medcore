@@ -27,10 +27,10 @@ public abstract class AuthServiceTestBase
     internal readonly IIdentityEmailService IdentityEmailService;
     internal readonly IIdentityUnitOfWork UnitOfWork;
     protected readonly IDbContextTransaction Transaction;
-    protected readonly IAuthService Sut;
     protected readonly ICurrentCultureService CurrentCultureService;
     protected readonly IUserCultureCache UserCultureCache;
     protected readonly IUserProfileService UserProfileService;
+    protected readonly IAuthService Sut;
     
     protected static readonly JwtSettings DefaultJwtSettings = new()
     {
@@ -101,5 +101,12 @@ public abstract class AuthServiceTestBase
         }
 
         return user;
+    }
+    
+    protected void SetupUserProfileFullName(Guid userId, string? fullName)
+    {
+        UserProfileService
+            .GetFullNameAsync(userId, Arg.Any<CancellationToken>())
+            .Returns(fullName);
     }
 }

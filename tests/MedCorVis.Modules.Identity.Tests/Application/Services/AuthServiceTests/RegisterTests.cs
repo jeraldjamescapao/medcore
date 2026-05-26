@@ -100,9 +100,11 @@ public sealed class RegisterTests : AuthServiceTestBase
         
         IdentityEmailService
             .SendConfirmationEmailAsync(
-                Arg.Any<ApplicationUser>(), 
-                Arg.Any<string>(), 
-                Arg.Any<string>(), 
+                Arg.Any<Guid>(),
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<string>(),
                 Arg.Any<CancellationToken>())
             .Returns(Task.FromException(new EmailDeliveryException("SMTP failed.")));
         
@@ -143,7 +145,9 @@ public sealed class RegisterTests : AuthServiceTestBase
 
         IdentityEmailService
             .SendConfirmationEmailAsync(
-                Arg.Any<ApplicationUser>(),
+                Arg.Any<Guid>(),
+                Arg.Any<string>(),
+                Arg.Any<string>(),
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 Arg.Any<CancellationToken>())
@@ -183,7 +187,9 @@ public sealed class RegisterTests : AuthServiceTestBase
 
         IdentityEmailService
             .SendConfirmationEmailAsync(
-                Arg.Any<ApplicationUser>(),
+                Arg.Any<Guid>(),
+                Arg.Any<string>(),
+                Arg.Any<string>(),
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 Arg.Any<CancellationToken>())
@@ -229,9 +235,11 @@ public sealed class RegisterTests : AuthServiceTestBase
         
         IdentityEmailService
             .SendConfirmationEmailAsync(
-                Arg.Any<ApplicationUser>(), 
-                Arg.Any<string>(), 
-                Arg.Any<string>(), 
+                Arg.Any<Guid>(),
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<string>(),
                 Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
         
