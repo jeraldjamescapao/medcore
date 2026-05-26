@@ -9,6 +9,7 @@ using MedCorVis.Common.Caching;
 using MedCorVis.Common.Exceptions;
 using MedCorVis.Common.Results;
 using MedCorVis.Common.Services;
+using MedCorVis.Common.UserProfiles;
 using MedCorVis.Modules.Identity.Application.Abstractions.Authentication;
 using MedCorVis.Modules.Identity.Application.Abstractions.Email;
 using MedCorVis.Modules.Identity.Application.Abstractions.Persistence;
@@ -27,6 +28,7 @@ internal sealed class AuthService : IAuthService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ICurrentCultureService _currentCultureService;
     private readonly IUserCultureCache _userCultureCache;
+    private readonly IUserProfileService _userProfileService;
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IIdentityEmailService _identityEmailService;
@@ -38,6 +40,7 @@ internal sealed class AuthService : IAuthService
         UserManager<ApplicationUser> userManager,
         ICurrentCultureService currentCultureService,
         IUserCultureCache userCultureCache,
+        IUserProfileService userProfileService,
         IJwtTokenService jwtTokenService,
         IRefreshTokenRepository refreshTokenRepository,
         IIdentityEmailService identityEmailService,
@@ -48,6 +51,7 @@ internal sealed class AuthService : IAuthService
         _userManager = userManager;
         _currentCultureService = currentCultureService;
         _userCultureCache = userCultureCache;
+        _userProfileService = userProfileService;
         _jwtTokenService = jwtTokenService;
         _refreshTokenRepository = refreshTokenRepository;
         _identityEmailService = identityEmailService;
@@ -96,6 +100,15 @@ internal sealed class AuthService : IAuthService
             }
             
             var roles = await _userManager.GetRolesAsync(user);
+            
+            await _userProfileService.CreateProfileAsync(
+                user.Id,
+                request.FirstName,
+                request.LastName,
+                request.BirthDate,
+                createdBy: ApplicationUser.SelfRegisteredActor,
+                ct);
+            
             var (accessToken, rawRefreshToken) = await IssueTokenPairAsync(user, roles, ct);
             
             var encodedToken = await GenerateEncodedConfirmationTokenAsync(user);

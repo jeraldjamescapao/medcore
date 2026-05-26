@@ -1,4 +1,4 @@
-namespace MedCorVis.Modules.Users.Application.Abstractions;
+namespace MedCorVis.Common.UserProfiles;
 
 public interface IUserProfileService
 {

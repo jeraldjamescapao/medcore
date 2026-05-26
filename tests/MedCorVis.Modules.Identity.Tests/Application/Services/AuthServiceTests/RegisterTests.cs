@@ -213,6 +213,16 @@ public sealed class RegisterTests : AuthServiceTestBase
             .GetRolesAsync(Arg.Any<ApplicationUser>())
             .Returns(["Patient"]);
         
+        UserProfileService
+            .CreateProfileAsync(
+                Arg.Any<Guid>(),
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<DateOnly>(),
+                Arg.Any<string>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+        
         UserManager
             .GenerateEmailConfirmationTokenAsync(Arg.Any<ApplicationUser>())
             .Returns("raw-email-token");
@@ -234,6 +244,44 @@ public sealed class RegisterTests : AuthServiceTestBase
         result.Value.Roles.Should().ContainSingle().Which.Should().Be("Patient");
         result.Value.AccessToken.Should().Be("access-token");
         result.Value.RawRefreshToken.Should().Be("raw-refresh-token");
-        await Transaction.Received(1).CommitAsync(Arg.Any<CancellationToken>());
+        await Transaction
+            .Received(1)
+            .CommitAsync(Arg.Any<CancellationToken>());
+    }
+    
+    [Fact]
+    public async Task RegisterAsync_ProfileCreationFails_RollsBackTransaction()
+    {
+        UserManager
+            .FindByEmailAsync(ValidRequest.Email)
+            .Returns((ApplicationUser?)null);
+
+        UserManager
+            .CreateAsync(Arg.Any<ApplicationUser>(), ValidRequest.Password)
+            .Returns(IdentityResult.Success);
+
+        UserManager
+            .AddToRoleAsync(Arg.Any<ApplicationUser>(), Arg.Any<string>())
+            .Returns(IdentityResult.Success);
+
+        UserManager
+            .GetRolesAsync(Arg.Any<ApplicationUser>())
+            .Returns(["Patient"]);
+
+        UserProfileService
+            .CreateProfileAsync(
+                Arg.Any<Guid>(),
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<DateOnly>(),
+                Arg.Any<string>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromException(new Exception("DB failure")));
+
+        await Assert.ThrowsAsync<Exception>(() => Sut.RegisterAsync(ValidRequest));
+
+        await Transaction
+            .Received(1)
+            .RollbackAsync(Arg.Any<CancellationToken>());
     }
 }

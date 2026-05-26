@@ -1,5 +1,6 @@
 namespace MedCorVis.Modules.Users.Application.Services;
 
+using MedCorVis.Common.UserProfiles;
 using MedCorVis.Modules.Users.Application.Abstractions;
 using MedCorVis.Modules.Users.Domain;
 

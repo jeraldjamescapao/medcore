@@ -2,7 +2,7 @@ namespace MedCorVis.Modules.Users.Application.Abstractions;
 
 using MedCorVis.Modules.Users.Domain;
 
-public interface IUserProfileRepository
+internal interface IUserProfileRepository
 {
     Task<UserProfile?> GetByUserIdAsync(Guid userId, CancellationToken ct = default);
     Task<IReadOnlyList<UserProfile>> GetByUserIdsAsync(

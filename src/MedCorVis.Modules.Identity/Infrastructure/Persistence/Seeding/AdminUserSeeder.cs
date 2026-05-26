@@ -1,6 +1,7 @@
 namespace MedCorVis.Modules.Identity.Infrastructure.Persistence.Seeding;
 
 using MedCorVis.Common.Authorization;
+using MedCorVis.Common.UserProfiles;
 using MedCorVis.Modules.Identity.Domain.Users;
 using MedCorVis.Modules.Identity.Infrastructure.Persistence.Logging;
 using Microsoft.AspNetCore.Identity;
@@ -58,6 +59,15 @@ internal static class AdminUserSeeder
             AdminUserSeederLogMessages.AdminUserSeedFailed(logger, email, errors, null);
             throw new InvalidOperationException($"Failed to assign Admin role to '{email}': {errors}");
         }
+        
+        var userProfileService = scope.ServiceProvider.GetRequiredService<IUserProfileService>();
+        await userProfileService.CreateProfileAsync(
+            user.Id,
+            firstName,
+            lastName,
+            // BirthDate is required by the domain entity but has no meaning for a system-seeded admin account.
+            birthDate: new DateOnly(1990, 1, 1),
+            createdBy: SystemActors.System);
 
         AdminUserSeederLogMessages.AdminUserSeededSuccessfully(logger, email, null);
     }
