@@ -25,13 +25,34 @@ public sealed class GetCurrentUserTests : UserServiceTestBase
     }
     
     [Fact]
-    public async Task GetCurrentUserAsync_UserExists_ReturnsCorrectShape()
+    public async Task GetCurrentUserAsync_ProfileNotFound_ReturnsNotFound()
     {
         var user = CreateUser();
 
         UserManager
             .FindByIdAsync(UserId.ToString())
             .Returns(user);
+
+        SetupProfile(UserId, null);
+
+        var result = await Sut.GetCurrentUserAsync(UserId);
+
+        result.IsFailure.Should().BeTrue();
+        result.ErrorType.Should().Be(ResultErrorType.NotFound);
+        result.Error!.Code.Should().Be("USERS_USER_NOT_FOUND");
+    }
+    
+    [Fact]
+    public async Task GetCurrentUserAsync_UserAndProfileExist_ReturnsCorrectShape()
+    {
+        var user    = CreateUser();
+        var profile = CreateProfile(user.Id);
+
+        UserManager
+            .FindByIdAsync(UserId.ToString())
+            .Returns(user);
+
+        SetupProfile(UserId, profile);
 
         var result = await Sut.GetCurrentUserAsync(UserId);
 

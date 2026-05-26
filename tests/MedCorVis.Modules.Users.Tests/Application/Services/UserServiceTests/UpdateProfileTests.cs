@@ -4,7 +4,7 @@ using FluentAssertions;
 using MedCorVis.Common.Results;
 using MedCorVis.Modules.Identity.Domain.Users;
 using MedCorVis.Modules.Users.Application.Contracts.Requests;
-using Microsoft.AspNetCore.Identity;
+using MedCorVis.Modules.Users.Domain;
 using NSubstitute;
 using Xunit;
 
@@ -14,9 +14,9 @@ public sealed class UpdateProfileTests : UserServiceTestBase
 
     private static readonly UpdateProfileRequest ValidRequest = new(
         FirstName: "James Capao",
-        LastName: "Test Update",
+        LastName:  "Test Update",
         BirthDate: new DateOnly(1965, 10, 10));
-    
+
     [Fact]
     public async Task UpdateProfileAsync_UserNotFound_ReturnsNotFound()
     {
@@ -30,9 +30,9 @@ public sealed class UpdateProfileTests : UserServiceTestBase
         result.ErrorType.Should().Be(ResultErrorType.NotFound);
         result.Error!.Code.Should().Be("USERS_USER_NOT_FOUND");
     }
-    
+
     [Fact]
-    public async Task UpdateProfileAsync_IdentityUpdateFails_ReturnsInternal()
+    public async Task UpdateProfileAsync_ProfileNotFound_ReturnsNotFound()
     {
         var user = CreateUser();
 
@@ -40,33 +40,26 @@ public sealed class UpdateProfileTests : UserServiceTestBase
             .FindByIdAsync(UserId.ToString())
             .Returns(user);
 
-        UserManager
-            .UpdateAsync(user)
-            .Returns(IdentityResult.Failed(new IdentityError
-            {
-                Code = "UpdateError",
-                Description = "Update failed."
-            }));
+        SetupProfile(UserId, null);
 
         var result = await Sut.UpdateProfileAsync(UserId, ValidRequest);
 
         result.IsFailure.Should().BeTrue();
-        result.ErrorType.Should().Be(ResultErrorType.Internal);
-        result.Error!.Code.Should().Be("USERS_PROFILE_UPDATE_FAILED");
+        result.ErrorType.Should().Be(ResultErrorType.NotFound);
+        result.Error!.Code.Should().Be("USERS_USER_NOT_FOUND");
     }
-    
+
     [Fact]
     public async Task UpdateProfileAsync_ValidRequest_ReturnsUpdatedProfile()
     {
-        var user = CreateUser();
+        var user    = CreateUser();
+        var profile = CreateProfile(user.Id);
 
         UserManager
             .FindByIdAsync(UserId.ToString())
             .Returns(user);
 
-        UserManager
-            .UpdateAsync(user)
-            .Returns(IdentityResult.Success);
+        SetupProfile(UserId, profile);
 
         var result = await Sut.UpdateProfileAsync(UserId, ValidRequest);
 

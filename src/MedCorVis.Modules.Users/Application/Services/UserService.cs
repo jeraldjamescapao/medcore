@@ -11,28 +11,39 @@ using MedCorVis.Modules.Users.Application.Contracts.Requests;
 using MedCorVis.Modules.Users.Application.Contracts.Responses;
 using MedCorVis.Modules.Users.Application.Errors;
 using MedCorVis.Modules.Users.Application.Logging;
+using MedCorVis.Modules.Users.Domain;
 
 internal sealed class UserService : IUserService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IUserCultureCache _userCultureCache;
+    private readonly IUserProfileRepository _userProfileRepository;
     private readonly ILogger<UserService> _logger;
     
     public UserService(
         UserManager<ApplicationUser> userManager, 
         IUserCultureCache userCultureCache,
+        IUserProfileRepository userProfileRepository,
         ILogger<UserService> logger)
     {
         _userManager = userManager;
         _userCultureCache = userCultureCache;
+        _userProfileRepository = userProfileRepository;
         _logger = logger;
     }
     
-    public async Task<Result<UserResponse>> GetCurrentUserAsync(Guid userId, CancellationToken ct = default)
+    public async Task<Result<UserResponse>> GetCurrentUserAsync(
+        Guid userId, CancellationToken ct = default)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-
         if (user is null)
+        {
+            UserLogMessages.GetCurrentUserNotFound(_logger, userId, null);
+            return Result<UserResponse>.NotFound(UserErrors.UserNotFound);
+        }
+
+        var profile = await _userProfileRepository.GetByUserIdAsync(userId, ct);
+        if (profile is null)
         {
             UserLogMessages.GetCurrentUserNotFound(_logger, userId, null);
             return Result<UserResponse>.NotFound(UserErrors.UserNotFound);
@@ -40,7 +51,7 @@ internal sealed class UserService : IUserService
 
         UserLogMessages.GetCurrentUserSucceeded(_logger, userId, null);
 
-        return Result<UserResponse>.Success(MapToResponse(user));
+        return Result<UserResponse>.Success(MapToResponse(user, profile));
     }
     
     public async Task<Result<bool>> UpdateCultureAsync(
@@ -85,19 +96,21 @@ internal sealed class UserService : IUserService
             return Result<UserResponse>.NotFound(UserErrors.UserNotFound);
         }
 
-        user.UpdateProfile(
+        var profile = await _userProfileRepository.GetByUserIdAsync(userId, ct);
+        if (profile is null)
+        {
+            UserLogMessages.UpdateProfileUserNotFound(_logger, userId, null);
+            return Result<UserResponse>.NotFound(UserErrors.UserNotFound);
+        }
+
+        profile.UpdateProfile(
             request.FirstName, request.LastName, request.BirthDate, userId.ToString());
 
-        var updateResult = await _userManager.UpdateAsync(user);
-        if (!updateResult.Succeeded)
-        {
-            UserLogMessages.UpdateProfileFailed(_logger, userId, null);
-            return Result<UserResponse>.Internal(UserErrors.ProfileUpdateFailed);
-        }
+        await _userProfileRepository.SaveChangesAsync(ct);
 
         UserLogMessages.UpdateProfileSucceeded(_logger, userId, null);
 
-        return Result<UserResponse>.Success(MapToResponse(user));
+        return Result<UserResponse>.Success(MapToResponse(user, profile));
     }
     
     public async Task<Result<bool>> UpdatePhoneAsync(
@@ -122,15 +135,15 @@ internal sealed class UserService : IUserService
         return Result<bool>.Success(true);
     }
 
-    private static UserResponse MapToResponse(ApplicationUser user)
+    private static UserResponse MapToResponse(ApplicationUser user, UserProfile profile)
     {
         return new UserResponse(
             user.Id,
             user.Email!,
-            user.FirstName,
-            user.LastName,
-            user.FullName,
-            user.BirthDate,
+            profile.FirstName,
+            profile.LastName,
+            profile.FullName,
+            profile.BirthDate,
             user.PreferredCulture,
             user.PhoneNumber,
             user.IsActive,
@@ -139,5 +152,4 @@ internal sealed class UserService : IUserService
             user.CreatedAtUtc,
             user.ModifiedAtUtc);
     }
-        
 }
